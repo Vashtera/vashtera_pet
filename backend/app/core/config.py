@@ -10,4 +10,4 @@ class Settings(BaseSettings):
     database_url: str
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg] # Loaded from .env
