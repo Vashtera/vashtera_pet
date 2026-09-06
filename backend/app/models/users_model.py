@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
+from app.database import Base
 from core.config import settings
-from database import Base
 from sqlalchemy import DECIMAL, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,9 +19,10 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
-
-    # TEMPORARY
-    favorite_premises: Mapped[int] = ...
+    favorite_premises: Mapped[list[int]] = relationship(
+        back_populates="premises.id",
+        cascade="all, delete-orphan",
+    )
     balance: Mapped[float] = mapped_column(DECIMAL(2), default=0)
     role_id: Mapped[int] = relationship(
         back_populates="roles.id",
