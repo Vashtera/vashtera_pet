@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from app.database import Base
-from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, Integer, String
+from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
