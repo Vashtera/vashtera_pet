@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from app.database import Base
-from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, String
+from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -31,6 +31,7 @@ class Premise(Base):
     )
     # "pending", "approve", "reject", "archived"
     status: Mapped[str] = mapped_column(String, default="pending")
+    contact_number: Mapped[str] = mapped_column(String(12), nullable=False)
 
 
 class PremiseType(Base):
