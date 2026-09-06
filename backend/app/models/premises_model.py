@@ -29,7 +29,7 @@ class Premise(Base):
         back_populates="premise_feature.id",
         cascade="all, delete-orphan",
     )
-    # "pending", "approve", "reject", "archived"
+    # available, booked, archived, cancelled, "archived"
     status: Mapped[str] = mapped_column(String, default="pending")
     contact_number: Mapped[str] = mapped_column(String(12), nullable=False)
 
