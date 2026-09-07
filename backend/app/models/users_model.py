@@ -1,9 +1,10 @@
 from datetime import UTC, datetime
 
-from app.database import Base
 from core.config import settings
 from sqlalchemy import DECIMAL, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from backend.app.database import Base
 
 
 class User(Base):
@@ -14,12 +15,12 @@ class User(Base):
         String(128), unique=True, index=True, nullable=False
     )
     password_hash: Mapped[str] = mapped_column(String(200), nullable=False)
-    image_file: Mapped[str] = mapped_column(String(200))
+    image_file: Mapped[str | None] = mapped_column(String(200))
     reset_tokens: Mapped[int] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
-    favorite_premises: Mapped[list[int]] = relationship(
+    favorite_premises: Mapped[list[int] | None] = relationship(
         back_populates="premises.id",
         cascade="all, delete-orphan",
     )

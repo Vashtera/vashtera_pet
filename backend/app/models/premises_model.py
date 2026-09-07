@@ -1,8 +1,9 @@
 from datetime import UTC, datetime
 
-from app.database import Base
 from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from backend.app.database import Base
 
 
 class Premise(Base):
@@ -24,7 +25,7 @@ class Premise(Base):
         default=lambda: datetime.now(UTC),
     )
     views: Mapped[int] = mapped_column(default=0, nullable=False)
-    description: Mapped[str] = mapped_column(TEXT)
+    description: Mapped[str | None] = mapped_column(TEXT)
     feature_id: Mapped[int] = relationship(
         back_populates="premise_feature.id",
         cascade="all, delete-orphan",
@@ -56,8 +57,8 @@ class PremiseAddress(Base):
 class PremiseFeature(Base):
     __tablename__ = "premise_feature"
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
-    image: Mapped[str] = mapped_column(nullable=True)
-    floor: Mapped[int] = mapped_column(nullable=True, default=1)
-    rooms: Mapped[int] = mapped_column(nullable=True)
+    image: Mapped[str | None] = mapped_column(nullable=True)
+    floor: Mapped[int | None] = mapped_column(nullable=True, default=1)
+    rooms: Mapped[int | None] = mapped_column(nullable=True)
     area: Mapped[float] = mapped_column(DECIMAL(1), nullable=False)
     price: Mapped[float] = mapped_column(DECIMAL(2), nullable=False)

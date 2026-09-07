@@ -1,8 +1,9 @@
 from datetime import UTC, datetime
 
-from app.database import Base
-from sqlalchemy import DECIMAL, DateTime, String
+from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from backend.app.database import Base
 
 
 class Dispute(Base):

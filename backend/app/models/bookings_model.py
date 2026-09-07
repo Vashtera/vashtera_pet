@@ -1,8 +1,9 @@
 from datetime import UTC, datetime
 
-from app.database import Base
-from sqlalchemy import DECIMAL, DateTime, String
+from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from backend.app.database import Base
 
 
 class Booking(Base):
@@ -20,7 +21,7 @@ class Booking(Base):
     date_from: Mapped[datetime] = mapped_column(DateTime)
     date_to: Mapped[datetime] = mapped_column(DateTime)
     # "pending", "approve", "reject"
-    status: Mapped[str] = mapped_column(String(64), nullable=False, default="available")
+    status: Mapped[str] = mapped_column(String(64), nullable=False, default="pending")
     payment_id: Mapped[int] = relationship(back_populates="payments.id")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
