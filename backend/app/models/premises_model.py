@@ -12,7 +12,7 @@ class Premise(Base):
     type_id: Mapped[int] = relationship(
         back_populates="premise_type.id", cascade="all, delete-orphan"
     )
-    land_lord_id: Mapped[int] = mapped_column(
+    landlord_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
         index=True,

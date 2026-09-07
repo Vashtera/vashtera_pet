@@ -62,7 +62,7 @@ class PasswordResetToken(Base):
 class Roles(Base):
     __tablename__ = "roles"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    is_landLord: Mapped[bool] = mapped_column(default=False)
+    is_landlord: Mapped[bool] = mapped_column(default=False)
     is_modDisputes: Mapped[bool] = mapped_column(default=False)
     is_modListings: Mapped[bool] = mapped_column(default=False)
     is_superMod: Mapped[bool] = mapped_column(default=False)
