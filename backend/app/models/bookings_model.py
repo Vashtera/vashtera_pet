@@ -8,6 +8,7 @@ from backend.app.database import Base
 
 class Booking(Base):
     __tablename__ = "bookings"
+
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     premise_id: Mapped[int] = relationship(
         back_populates="premises.id", cascade="all, delete-orphan"

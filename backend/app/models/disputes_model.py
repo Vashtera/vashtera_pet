@@ -8,6 +8,7 @@ from backend.app.database import Base
 
 class Dispute(Base):
     __tablename__ = "disputes"
+
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     renter_id: Mapped[int] = relationship(back_populates="users.id")
     landlord_id: Mapped[int] = relationship(back_populates="users.id")

@@ -1,16 +1,18 @@
 from datetime import UTC, datetime
 
-from core.config import settings
 from sqlalchemy import DECIMAL, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database import Base
 
+from ..core.config import settings
+
 
 class User(Base):
     __tablename__ = "users"
+
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
-    username: Mapped[str] = mapped_column(String(128), nullable=False)
+    username: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
     email: Mapped[str] = mapped_column(
         String(128), unique=True, index=True, nullable=False
     )
@@ -61,6 +63,7 @@ class PasswordResetToken(Base):
 
 class Roles(Base):
     __tablename__ = "roles"
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     is_landlord: Mapped[bool] = mapped_column(default=False)
     is_modDisputes: Mapped[bool] = mapped_column(default=False)

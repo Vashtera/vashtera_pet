@@ -8,6 +8,7 @@ from backend.app.database import Base
 
 class Premise(Base):
     __tablename__ = "premises"
+
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     type_id: Mapped[int] = relationship(
         back_populates="premise_type.id", cascade="all, delete-orphan"
@@ -37,6 +38,7 @@ class Premise(Base):
 
 class PremiseType(Base):
     __tablename__ = "premise_type"
+
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     is_apartments: Mapped[bool] = mapped_column(default=False)
     is_house: Mapped[bool] = mapped_column(default=False)
@@ -47,6 +49,7 @@ class PremiseType(Base):
 
 class PremiseAddress(Base):
     __tablename__ = "premise_address"
+
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     city: Mapped[str] = mapped_column(String(128), nullable=False)
     district: Mapped[str] = mapped_column(String(128), nullable=False)
@@ -56,6 +59,7 @@ class PremiseAddress(Base):
 
 class PremiseFeature(Base):
     __tablename__ = "premise_feature"
+
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     image: Mapped[str | None] = mapped_column(nullable=True)
     floor: Mapped[int | None] = mapped_column(nullable=True, default=1)
