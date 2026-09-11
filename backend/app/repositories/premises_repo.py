@@ -1,9 +1,10 @@
 from typing import Optional
 
-from app.models.premises_model import Premise
-from app.schemas.premises_scheme import PremisePublic
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..models.premises_model import Premise
+from ..schemas.premises_scheme import PremisePublic
 
 
 class PremiseRepo:

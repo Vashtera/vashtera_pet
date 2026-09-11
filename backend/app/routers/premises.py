@@ -1,7 +1,8 @@
-from database import get_db
 from fastapi import APIRouter, Depends
-from schemas.premises_scheme import PremisePublic
-from services.premises_service import PremiseService
+
+from ..database import get_db
+from ..schemas.premises_scheme import PremisePublic
+from ..services.premises_service import PremiseService
 
 router = APIRouter()
 

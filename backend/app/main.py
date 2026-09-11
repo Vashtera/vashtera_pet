@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
 
-from app.database import engine
 from fastapi import FastAPI
-from routers.premises import router as premise_router
+
+from .database import engine
+from .routers.premises import router as premise_router
 
 
 @asynccontextmanager
