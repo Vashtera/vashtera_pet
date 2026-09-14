@@ -17,15 +17,8 @@ class PremiseBase(BaseModel):
 class PremiseCreate(PremiseBase): ...
 
 
-class PremisePublic(PremiseBase):
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
-
-
-class PremisePrivate(PremiseBase):
+class PremiseResponse(PremiseBase):
     id: int
-
     model_config = ConfigDict(
         from_attributes=True,
     )
