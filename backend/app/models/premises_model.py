@@ -12,7 +12,7 @@ class Premise(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     type_id: Mapped[int] = mapped_column(
-        ForeignKey("PremiseType.id"),
+        ForeignKey("premise_type.id"),
         nullable=False,
         index=True,
     )
@@ -29,7 +29,7 @@ class Premise(Base):
         back_populates="premise", cascade="all, delete-orphan"
     )
     address_id: Mapped[int] = mapped_column(
-        ForeignKey("PremiseAddress.id"), index=True, nullable=False
+        ForeignKey("premise_address.id"), index=True, nullable=False
     )
     address: Mapped["PremiseAddress"] = relationship(
         back_populates="premise", cascade="all, delete-orphan"
@@ -41,7 +41,7 @@ class Premise(Base):
     views: Mapped[int] = mapped_column(default=0, nullable=False)
     description: Mapped[str | None] = mapped_column(TEXT)
     feature_id: Mapped[int] = mapped_column(
-        ForeignKey("PremiseFeature.id"), index=True, nullable=False
+        ForeignKey("premise_feature.id"), index=True, nullable=False
     )
     feature: Mapped["PremiseFeature"] = relationship(
         back_populates="premise", cascade="all, delete-orphan"

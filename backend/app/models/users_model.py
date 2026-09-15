@@ -27,11 +27,11 @@ class User(Base):
         cascade="all, delete-orphan",
     )
     favorite_premises: Mapped[list[int] | None] = mapped_column(
-        ForeignKey("Premise.id"), index=True, nullable=True
+        ForeignKey("premises.id"), index=True, nullable=True
     )
     balance: Mapped[float] = mapped_column(DECIMAL(2), default=0)
     role_id: Mapped[int] = mapped_column(
-        ForeignKey("Roles.id"), index=True, nullable=False
+        ForeignKey("roles.id"), index=True, nullable=False
     )
     roles: Mapped["Roles"] = relationship(
         back_populates="user",
