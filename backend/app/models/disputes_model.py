@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import TEXT, DateTime, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.app.database import Base
 
@@ -10,10 +10,19 @@ class Dispute(Base):
     __tablename__ = "disputes"
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
-    renter_id: Mapped[int] = relationship(back_populates="users.id")
-    landlord_id: Mapped[int] = relationship(back_populates="users.id")
-    booking_id: Mapped[int] = relationship(back_populates="bookings.id")
-    mod_dispute: Mapped[int] = relationship(back_populates="users.id")
+    renter_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), index=True, nullable=False
+    )
+    landlord_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), index=True, nullable=False
+    )
+    booking_id: Mapped[int] = mapped_column(
+        ForeignKey("bookings.id"), index=True, nullable=False
+    )
+    mod_dispute: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), index=True, nullable=False
+    )
+    reason: Mapped[str] = mapped_column(TEXT, nullable=False)
     # under_review, two_party_dispute_resolution, three_party_dispute_resolution, completed
     status: Mapped[str] = mapped_column(
         String(64), nullable=False, default="under_review"
