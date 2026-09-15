@@ -18,7 +18,7 @@ class User(Base):
         String(128), unique=True, index=True, nullable=False
     )
     contact_number: Mapped[int] = mapped_column(
-        mapped_column(String(12), nullable=False)
+        mapped_column(String(12), nullable=False, unique=True, index=True)
     )
     password_hash: Mapped[str] = mapped_column(String(200), nullable=False)
     image_file: Mapped[str | None] = mapped_column(String(200))
@@ -33,7 +33,7 @@ class User(Base):
     role_id: Mapped[int] = mapped_column(
         ForeignKey("roles.id"), index=True, nullable=False
     )
-    roles: Mapped["Roles"] = relationship(
+    role: Mapped["Roles"] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )

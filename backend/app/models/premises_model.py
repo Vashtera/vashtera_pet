@@ -46,7 +46,7 @@ class Premise(Base):
     feature: Mapped["PremiseFeature"] = relationship(
         back_populates="premise", cascade="all, delete-orphan"
     )
-    # available, booked, archived, cancelled
+    # available, booked, archived, cancelled, pending
     status: Mapped[str] = mapped_column(String, default="pending")
     contact_number: Mapped[str] = mapped_column(String(12), nullable=False)
 
