@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.app.database import Base
 
 from ..core.config import settings
+from ..models.premises_model import Premise
 
 
 class User(Base):
@@ -25,13 +26,19 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
-    favorite_premises: Mapped[list[int] | None] = relationship(
-        back_populates="premises.id",
-        cascade="all, delete-orphan",
+    favorite_premises: Mapped[list[int] | None] = mapped_column(
+        ForeignKey("Premise.id"), index=True, nullable=True
     )
     balance: Mapped[float] = mapped_column(DECIMAL(2), default=0)
-    role_id: Mapped[int] = relationship(
-        back_populates="roles.id",
+    role_id: Mapped[int] = mapped_column(
+        ForeignKey("Roles.id"), index=True, nullable=False
+    )
+    roles: Mapped["Roles"] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    user_premises: Mapped[Premise] = relationship(
+        back_populates="landlord",
         cascade="all, delete-orphan",
     )
 
@@ -58,7 +65,7 @@ class PasswordResetToken(Base):
         default=lambda: datetime.now(UTC),
     )
 
-    user: Mapped[User] = relationship(
+    user: Mapped["User"] = relationship(
         back_populates="reset_tokens",
         cascade="all, delete-orphan",
     )
@@ -72,3 +79,6 @@ class Roles(Base):
     is_modDisputes: Mapped[bool] = mapped_column(default=False)
     is_modListings: Mapped[bool] = mapped_column(default=False)
     is_superMod: Mapped[bool] = mapped_column(default=False)
+    user: Mapped["User"] = relationship(
+        back_populates="role", cascade="all, delete-orphan"
+    )
