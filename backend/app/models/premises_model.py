@@ -18,8 +18,9 @@ class Premise(Base):
         nullable=False,
         index=True,
     )
-    address_id: Mapped[int] = relationship(
-        back_populates="premise_address.id", cascade="all, delete-orphan"
+    address_id: Mapped[int] = mapped_column(ForeignKey("PremiseAddress.id"))
+    address: Mapped[PremiseAddress] = relationship(
+        back_populates="premise", cascade="all, delete-orphan"
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -31,7 +32,7 @@ class Premise(Base):
         back_populates="premise_feature.id",
         cascade="all, delete-orphan",
     )
-    # available, booked, archived, cancelled, "archived"
+    # available, booked, archived, cancelled
     status: Mapped[str] = mapped_column(String, default="pending")
     contact_number: Mapped[str] = mapped_column(String(12), nullable=False)
 

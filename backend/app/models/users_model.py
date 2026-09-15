@@ -16,6 +16,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(
         String(128), unique=True, index=True, nullable=False
     )
+    contact_number: Mapped[int] = mapped_column(
+        mapped_column(String(12), nullable=False)
+    )
     password_hash: Mapped[str] = mapped_column(String(200), nullable=False)
     image_file: Mapped[str | None] = mapped_column(String(200))
     reset_tokens: Mapped[int] = relationship(
