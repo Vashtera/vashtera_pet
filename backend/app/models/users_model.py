@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DECIMAL, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -6,7 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.app.database import Base
 
 from ..core.config import settings
-from ..models.premises_model import Premise
+
+if TYPE_CHECKING:
+    from ..models.premises_model import Premise
 
 
 class User(Base):
@@ -17,8 +20,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(
         String(128), unique=True, index=True, nullable=False
     )
-    contact_number: Mapped[int] = mapped_column(
-        mapped_column(String(12), nullable=False, unique=True, index=True)
+    contact_number: Mapped[str] = mapped_column(
+        String(12), nullable=False, unique=True, index=True
     )
     password_hash: Mapped[str] = mapped_column(String(200), nullable=False)
     image_file: Mapped[str | None] = mapped_column(String(200))

@@ -1,10 +1,13 @@
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
-from ..models.users_model import User
+
+if TYPE_CHECKING:
+    from ..models.users_model import User
 
 
 class Premise(Base):
@@ -25,7 +28,7 @@ class Premise(Base):
         nullable=False,
         index=True,
     )
-    landlord = Mapped[User] = relationship(
+    landlord: Mapped[User] = relationship(
         back_populates="premise", cascade="all, delete-orphan"
     )
     address_id: Mapped[int] = mapped_column(
