@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DECIMAL, DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database import Base
@@ -32,7 +32,7 @@ class User(Base):
     favorite_premises: Mapped[list[int] | None] = mapped_column(
         ForeignKey("premises.id"), index=True, nullable=True
     )
-    balance: Mapped[float] = mapped_column(DECIMAL(2), default=0)
+    balance: Mapped[float] = mapped_column(Float, default=0)
     role_id: Mapped[int] = mapped_column(
         ForeignKey("roles.id"), index=True, nullable=False
     )

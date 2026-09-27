@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import DECIMAL, DateTime, ForeignKey, String
+from sqlalchemy import DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.app.database import Base
@@ -22,7 +22,7 @@ class Payment(Base):
         ForeignKey("premises.id"), index=True, nullable=False
     )
     token: Mapped[str] = mapped_column(String(64), nullable=False)
-    total: Mapped[float] = mapped_column(DECIMAL(2), nullable=False)
+    total: Mapped[float] = mapped_column(Float, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),

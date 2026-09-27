@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, String
+from sqlalchemy import DECIMAL, TEXT, DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -88,8 +88,8 @@ class PremiseFeature(Base):
     image: Mapped[str | None] = mapped_column(nullable=True)
     floor: Mapped[int | None] = mapped_column(nullable=True, default=1)
     rooms: Mapped[int | None] = mapped_column(nullable=True)
-    area: Mapped[float] = mapped_column(DECIMAL(1), nullable=False)
-    price: Mapped[float] = mapped_column(DECIMAL(2), nullable=False)
+    area: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
+    price: Mapped[float] = mapped_column(Float, nullable=False)
     premise: Mapped["Premise"] = relationship(
         back_populates="feature", cascade="all, delete-orphan"
     )
