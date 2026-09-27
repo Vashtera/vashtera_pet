@@ -16,3 +16,11 @@ async def get_premise_by_id(
     premise_id: int, db: PremiseService = Depends(get_premise_service)
 ):
     return db.get_premise_by_id(premise_id)
+
+
+# TEMPORARY
+@router.get("premises/{premise_city}")
+async def get_premises_by_city(
+    premise_city: str, db: PremiseService = Depends(get_premise_service)
+):
+    return db.get_premises_by_city(premise_city)
