@@ -20,23 +20,20 @@ class Premise(Base):
         index=True,
     )
     type: Mapped["PremiseType"] = relationship(
-        back_populates="premise",
-        cascade="all, delete-orphan",
+        back_populates="premise", single_parent=True
     )
     landlord_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
         index=True,
     )
-    landlord: Mapped[User] = relationship(
+    landlord: Mapped["User"] = relationship(
         back_populates="premise", cascade="all, delete-orphan"
     )
     address_id: Mapped[int] = mapped_column(
         ForeignKey("premise_address.id"), index=True, nullable=False
     )
-    address: Mapped["PremiseAddress"] = relationship(
-        back_populates="premise", cascade="all, delete-orphan"
-    )
+    address: Mapped["PremiseAddress"] = relationship(back_populates="premise")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
@@ -63,9 +60,7 @@ class PremiseType(Base):
     is_countryHouse: Mapped[bool] = mapped_column(default=False)
     is_commercialPremise: Mapped[bool] = mapped_column(default=False)
     is_warehouse: Mapped[bool] = mapped_column(default=False)
-    premise: Mapped["Premise"] = relationship(
-        back_populates="type", cascade="all, delete-orphan"
-    )
+    premise: Mapped["Premise"] = relationship(back_populates="type")
 
 
 class PremiseAddress(Base):

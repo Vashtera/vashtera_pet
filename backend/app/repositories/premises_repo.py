@@ -19,7 +19,7 @@ class PremiseRepo:
     async def get_premises_by_city(self, premise_city: str) -> str:
         stmt = (
             select(Premise)
-            .join(Premise.address)
+            .join(Premise, PremiseAddress.id == Premise.address_id)
             .where(PremiseAddress.city == premise_city)
             .options(selectinload(Premise.address))
         )

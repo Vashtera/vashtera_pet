@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from ..database import get_db
-from ..schemas.premises_scheme import PremiseResponse
+from ..schemas.premises_scheme import PaginatedPremiseResponse, PremiseResponse
 from ..services.premises_service import PremiseService
 
 router = APIRouter()
@@ -11,16 +11,16 @@ def get_premise_service(session=Depends(get_db)):
     return PremiseService(session)
 
 
-@router.get("premises/{premise_id}", response_model=PremiseResponse)
+@router.get("/{premise_id}/", response_model=PremiseResponse)
 async def get_premise_by_id(
     premise_id: int, db: PremiseService = Depends(get_premise_service)
-):
-    return db.get_premise_by_id(premise_id)
+) -> PremiseResponse:
+    return await db.get_premise_by_id(premise_id)
 
 
 # TEMPORARY
-@router.get("premises/{premise_city}")
+@router.get("/city/{premise_city}/", response_model=PaginatedPremiseResponse)
 async def get_premises_by_city(
     premise_city: str, db: PremiseService = Depends(get_premise_service)
-):
-    return db.get_premises_by_city(premise_city)
+) -> PaginatedPremiseResponse:
+    return await db.get_premises_by_city(premise_city)

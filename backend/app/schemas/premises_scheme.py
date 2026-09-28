@@ -24,6 +24,10 @@ class PremiseResponse(PremiseBase):
     )
 
 
+class PaginatedPremiseResponse(BaseModel):
+    posts: list[PremiseResponse]
+
+
 class PremiseUpdate(BaseModel):
     description: str | None = Field(..., min_length=5, max_length=1000)
     feature: str
