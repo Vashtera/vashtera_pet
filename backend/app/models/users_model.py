@@ -4,12 +4,9 @@ from typing import TYPE_CHECKING
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.database import Base
-
 from ..core.config import settings
-
-if TYPE_CHECKING:
-    from ..models.premises_model import Premise
+from ..database import Base
+from ..models.premises_model import Premise
 
 
 class User(Base):
