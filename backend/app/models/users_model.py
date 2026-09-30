@@ -1,12 +1,11 @@
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING
 
+from database import Base
+from models import Premise
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..core.config import settings
-from ..database import Base
-from ..models.premises_model import Premise
 
 
 class User(Base):

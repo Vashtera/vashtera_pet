@@ -1,9 +1,8 @@
 from datetime import UTC, datetime
 
+from database import Base
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
-
-from ..database import Base
 
 
 class Booking(Base):
