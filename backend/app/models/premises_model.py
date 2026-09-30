@@ -27,7 +27,7 @@ class Premise(Base):
         index=True,
     )
     landlord: Mapped["User"] = relationship(
-        back_populates="premises",
+        back_populates="user_premises",
         single_parent=True,
         cascade="all, delete-orphan",
         foreign_keys=[landlord_id],
