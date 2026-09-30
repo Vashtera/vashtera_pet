@@ -32,10 +32,9 @@ class User(Base):
         ForeignKey("roles.id"), index=True, nullable=False
     )
     role: Mapped["Roles"] = relationship(
-        back_populates="user",
-        cascade="all, delete-orphan",
+        back_populates="user", cascade="all, delete-orphan", foreign_keys=[role_id]
     )
-    user_premises: Mapped["Premise"] = relationship(
+    user_premises: Mapped[list["Premise"]] = relationship(
         back_populates="landlord",
         cascade="all, delete-orphan",
     )

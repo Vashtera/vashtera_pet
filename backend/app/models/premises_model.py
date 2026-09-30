@@ -16,7 +16,10 @@ class Premise(Base):
         index=True,
     )
     type: Mapped["PremiseType"] = relationship(
-        back_populates="premise", single_parent=True
+        back_populates="premise",
+        single_parent=True,
+        cascade="all, delete-orphan",
+        foreign_keys=[type_id],
     )
     landlord_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
@@ -24,12 +27,19 @@ class Premise(Base):
         index=True,
     )
     landlord: Mapped["User"] = relationship(
-        back_populates="premise", single_parent=True
+        back_populates="premises",
+        single_parent=True,
+        cascade="all, delete-orphan",
+        foreign_keys=[landlord_id],
     )
     address_id: Mapped[int] = mapped_column(
         ForeignKey("premise_address.id"), index=True, nullable=False
     )
-    address: Mapped["PremiseAddress"] = relationship(back_populates="premise")
+    address: Mapped["PremiseAddress"] = relationship(
+        back_populates="premise",
+        cascade="all, delete-orphan",
+        foreign_keys=[address_id],
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
@@ -40,7 +50,9 @@ class Premise(Base):
         ForeignKey("premise_feature.id"), index=True, nullable=False
     )
     feature: Mapped["PremiseFeature"] = relationship(
-        back_populates="premise", cascade="all, delete-orphan"
+        back_populates="premise",
+        cascade="all, delete-orphan",
+        foreign_keys=[feature_id],
     )
     # available, booked, archived, cancelled, pending
     status: Mapped[str] = mapped_column(String, default="pending")
