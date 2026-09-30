@@ -1,11 +1,10 @@
 from datetime import UTC, datetime
 
-from database import Base
-from models import Premise
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..core.config import settings
+from ..database import Base
 
 
 class User(Base):
@@ -36,7 +35,7 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
-    user_premises: Mapped[Premise] = relationship(
+    user_premises: Mapped["Premise"] = relationship(
         back_populates="landlord",
         cascade="all, delete-orphan",
     )
@@ -63,7 +62,6 @@ class PasswordResetToken(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
     )
-
     user: Mapped["User"] = relationship(
         back_populates="reset_tokens",
         cascade="all, delete-orphan",

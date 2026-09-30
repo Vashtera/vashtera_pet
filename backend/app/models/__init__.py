@@ -1,4 +1,3 @@
-from ..database import Base
 from ..models.bookings_model import Booking
 from ..models.disputes_model import Dispute
 from ..models.payments_model import Payment
