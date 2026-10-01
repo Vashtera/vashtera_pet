@@ -75,6 +75,4 @@ class Roles(Base):
     is_modDisputes: Mapped[bool] = mapped_column(default=False)
     is_modListings: Mapped[bool] = mapped_column(default=False)
     is_superMod: Mapped[bool] = mapped_column(default=False)
-    user: Mapped["User"] = relationship(
-        back_populates="role", cascade="all, delete-orphan"
-    )
+    user: Mapped["User"] = relationship(back_populates="role")

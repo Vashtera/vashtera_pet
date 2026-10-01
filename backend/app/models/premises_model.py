@@ -17,7 +17,6 @@ class Premise(Base):
     )
     type: Mapped["PremiseType"] = relationship(
         back_populates="premise",
-        single_parent=True,
         cascade="all, delete-orphan",
         foreign_keys=[type_id],
     )
@@ -29,7 +28,6 @@ class Premise(Base):
     landlord: Mapped["User"] = relationship(
         back_populates="user_premises",
         single_parent=True,
-        cascade="all, delete-orphan",
         foreign_keys=[landlord_id],
     )
     address_id: Mapped[int] = mapped_column(
@@ -79,9 +77,7 @@ class PremiseAddress(Base):
     district: Mapped[str] = mapped_column(String(128), nullable=False)
     street: Mapped[str] = mapped_column(String(128), nullable=False)
     house_number: Mapped[str] = mapped_column(String(128), nullable=False)
-    premise: Mapped["Premise"] = relationship(
-        back_populates="address", cascade="all, delete-orphan"
-    )
+    premise: Mapped["Premise"] = relationship(back_populates="address")
 
 
 class PremiseFeature(Base):
@@ -93,6 +89,4 @@ class PremiseFeature(Base):
     rooms: Mapped[int | None] = mapped_column(nullable=True)
     area: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
     price: Mapped[float] = mapped_column(Float, nullable=False)
-    premise: Mapped["Premise"] = relationship(
-        back_populates="feature", cascade="all, delete-orphan"
-    )
+    premise: Mapped["Premise"] = relationship(back_populates="feature")
