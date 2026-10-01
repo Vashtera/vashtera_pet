@@ -1,6 +1,4 @@
-from typing import Optional
-
-from sqlalchemy import func, select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -16,7 +14,7 @@ class PremiseRepo:
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
-    async def get_premises_by_city(self, premise_city: str) -> str:
+    async def get_premises_by_city(self, premise_city: str):
         stmt = (
             select(Premise)
             .join(Premise.address)

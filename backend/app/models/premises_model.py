@@ -17,6 +17,7 @@ class Premise(Base):
     )
     type: Mapped["PremiseType"] = relationship(
         back_populates="premise",
+        single_parent=True,
         cascade="all, delete-orphan",
         foreign_keys=[type_id],
     )
@@ -35,6 +36,7 @@ class Premise(Base):
     )
     address: Mapped["PremiseAddress"] = relationship(
         back_populates="premise",
+        single_parent=True,
         cascade="all, delete-orphan",
         foreign_keys=[address_id],
     )
@@ -49,6 +51,7 @@ class Premise(Base):
     )
     feature: Mapped["PremiseFeature"] = relationship(
         back_populates="premise",
+        single_parent=True,
         cascade="all, delete-orphan",
         foreign_keys=[feature_id],
     )

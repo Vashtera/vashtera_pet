@@ -20,7 +20,7 @@ class User(Base):
     )
     password_hash: Mapped[str] = mapped_column(String(200), nullable=False)
     image_file: Mapped[str | None] = mapped_column(String(200))
-    reset_tokens: Mapped[int] = relationship(
+    reset_tokens: Mapped["PasswordResetToken"] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
