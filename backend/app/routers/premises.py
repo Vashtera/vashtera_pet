@@ -11,7 +11,7 @@ def get_premise_service(session=Depends(get_db)):
     return PremiseService(session)
 
 
-@router.get("/{premise_id}/", response_model=PremiseResponse)
+@router.get("/{premise_id}", response_model=PremiseResponse)
 async def get_premise_by_id(
     premise_id: int, db: PremiseService = Depends(get_premise_service)
 ) -> PremiseResponse:
@@ -19,8 +19,8 @@ async def get_premise_by_id(
 
 
 # TEMPORARY
-@router.get("/city/{premise_city}/", response_model=PaginatedPremiseResponse)
+@router.get("/city/{premise_city}")
 async def get_premises_by_city(
     premise_city: str, db: PremiseService = Depends(get_premise_service)
-) -> PaginatedPremiseResponse:
+):
     return await db.get_premises_by_city(premise_city)
