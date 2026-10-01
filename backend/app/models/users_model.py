@@ -31,12 +31,14 @@ class User(Base):
     role_id: Mapped[int] = mapped_column(
         ForeignKey("roles.id"), index=True, nullable=False
     )
-    role: Mapped["Roles"] = relationship(
-        back_populates="user", cascade="all, delete-orphan", foreign_keys=[role_id]
+    role: Mapped["Roles"] = relationship(back_populates="user", foreign_keys=[role_id])
+    user_premises_id: Mapped[int] = mapped_column(
+        ForeignKey("premises.id"), nullable=True
     )
     user_premises: Mapped[list["Premise"]] = relationship(
         back_populates="landlord",
         cascade="all, delete-orphan",
+        foreign_keys=[user_premises_id],
     )
 
     # TEMPORARY

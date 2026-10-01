@@ -17,8 +17,6 @@ class Premise(Base):
     )
     type: Mapped["PremiseType"] = relationship(
         back_populates="premise",
-        single_parent=True,
-        cascade="all, delete-orphan",
         foreign_keys=[type_id],
     )
     landlord_id: Mapped[int] = mapped_column(
@@ -29,6 +27,7 @@ class Premise(Base):
     landlord: Mapped["User"] = relationship(
         back_populates="user_premises",
         single_parent=True,
+        cascade="all, delete-orphan",
         foreign_keys=[landlord_id],
     )
     address_id: Mapped[int] = mapped_column(
@@ -36,8 +35,6 @@ class Premise(Base):
     )
     address: Mapped["PremiseAddress"] = relationship(
         back_populates="premise",
-        single_parent=True,
-        cascade="all, delete-orphan",
         foreign_keys=[address_id],
     )
     created_at: Mapped[datetime] = mapped_column(
@@ -51,8 +48,6 @@ class Premise(Base):
     )
     feature: Mapped["PremiseFeature"] = relationship(
         back_populates="premise",
-        single_parent=True,
-        cascade="all, delete-orphan",
         foreign_keys=[feature_id],
     )
     # available, booked, archived, cancelled, pending
