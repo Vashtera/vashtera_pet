@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from ..database import get_db
-from ..schemas.premises_scheme import PaginatedPremisesResponse, PremiseResponse
+from ..schemas.premises_scheme import PremiseResponse, ShortPremiseResponse
 from ..services.premises_service import PremiseService
 
 router = APIRouter()
@@ -19,7 +19,7 @@ async def get_premise_by_id(
 
 
 # TEMPORARY
-@router.get("/city/{premise_city}", response_model=PaginatedPremisesResponse)
+@router.get("/city/{premise_city}", response_model=list[ShortPremiseResponse])
 async def get_premises_by_city(
     premise_city: str, db: PremiseService = Depends(get_premise_service)
 ):

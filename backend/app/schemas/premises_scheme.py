@@ -7,10 +7,14 @@ class ORMBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class AddressResponse(ORMBase):
+class ShortAddressResponse(ORMBase):
     street: str
     city: str
     district: str
+
+
+class FullAddressResponse(ShortAddressResponse):
+    house_number: int | None
 
 
 class LandlordResponse(ORMBase):
@@ -29,7 +33,7 @@ class TypeResponse(ORMBase):
 
 class FeatureResponse(ORMBase):
     image: str | None = None
-    floor: int
+    floor: int | None
     area: float
     rooms: int
     price: int
@@ -39,13 +43,18 @@ class PremiseResponse(ORMBase):
     views: int
     contact_number: str
     created_at: datetime
-    description: str
+    description: str | None
     status: str
-    address: AddressResponse
+    address: FullAddressResponse
     landlord: LandlordResponse
     type: TypeResponse
     feature: FeatureResponse
 
 
-class PaginatedPremisesResponse(ORMBase):
-    premises: list[PremiseResponse]
+class ShortPremiseResponse(ORMBase):
+    id: int
+    views: int
+    created_at: datetime
+    type: TypeResponse
+    feature: FeatureResponse
+    address: ShortAddressResponse

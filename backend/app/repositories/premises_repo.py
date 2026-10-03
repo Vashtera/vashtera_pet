@@ -28,7 +28,12 @@ class PremiseRepo:
             select(Premise)
             .join(Premise.address)
             .where(PremiseAddress.city == premise_city)
-            .options(selectinload(Premise.address))
+            .options(
+                selectinload(Premise.landlord),
+                selectinload(Premise.type),
+                selectinload(Premise.address),
+                selectinload(Premise.feature),
+            )
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
