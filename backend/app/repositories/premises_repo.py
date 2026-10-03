@@ -10,7 +10,16 @@ class PremiseRepo:
         self.session = session
 
     async def get_premise_by_id(self, premise_id: int):
-        stmt = select(Premise).where(Premise.id == premise_id)
+        stmt = (
+            select(Premise)
+            .where(Premise.id == premise_id)
+            .options(
+                selectinload(Premise.landlord),
+                selectinload(Premise.type),
+                selectinload(Premise.address),
+                selectinload(Premise.feature),
+            )
+        )
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
