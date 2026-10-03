@@ -1,33 +1,51 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
-class PremiseBase(BaseModel):
-    type: str
-    landlord: str
-    address: str
-    created_at: datetime
-    views: int
-    description: str | None = Field(..., min_length=5, max_length=1000)
-    feature: str
-    status: str
+class ORMBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
 
-class PremiseCreate(PremiseBase): ...
+class AddressResponse(ORMBase):
+    street: str
+    city: str
+    district: str
 
 
-class PremiseResponse(PremiseBase):
+class LandlordResponse(ORMBase):
     id: int
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
+    username: str
+    image_file: str | None = None
 
 
-class PaginatedPremiseResponse(BaseModel):
-    posts: list[PremiseResponse]
+class TypeResponse(ORMBase):
+    is_countryHouse: bool
+    is_warehouse: bool
+    is_house: bool
+    is_apartments: bool
+    is_commercialPremise: bool
 
 
-class PremiseUpdate(BaseModel):
-    description: str | None = Field(..., min_length=5, max_length=1000)
-    feature: str
+class FeatureResponse(ORMBase):
+    image: str | None = None
+    floor: int
+    area: float
+    rooms: int
+    price: int
+
+
+class PremiseResponse(ORMBase):
+    views: int
+    contact_number: str
+    created_at: datetime
+    description: str
+    status: str
+    address: AddressResponse
+    landlord: LandlordResponse
+    type: TypeResponse
+    feature: FeatureResponse
+
+
+class PaginatedPremisesResponse(ORMBase):
+    premises: list[PremiseResponse]
