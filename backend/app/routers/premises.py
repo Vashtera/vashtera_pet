@@ -18,7 +18,6 @@ async def get_premise_by_id(
     return await db.get_premise_by_id(premise_id)
 
 
-# TEMPORARY
 @router.get("/city/{premise_city}", response_model=list[ShortPremiseResponse])
 async def get_premises_by_city(
     premise_city: str, db: PremiseService = Depends(get_premise_service)

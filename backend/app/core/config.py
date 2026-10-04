@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,6 +13,10 @@ class Settings(BaseSettings):
         extra="ignore",
     )
     database_url: str
+
+    secret_key: SecretStr
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
 
 
 settings = Settings()  # type: ignore[call-arg] # Loaded from .env
