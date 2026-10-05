@@ -62,7 +62,5 @@ class ShortPremiseResponse(ORMBase):
 
 class PremiseCreate(ORMBase):
     type: TypeResponse
-    address: FullAddressResponse
-    feature: FeatureResponse
     description: str | None
     contact_number: str

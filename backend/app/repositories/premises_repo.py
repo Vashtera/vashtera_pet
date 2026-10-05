@@ -2,8 +2,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ..models.premises_model import Premise, PremiseAddress
-from ..schemas.premises_scheme import PremiseCreate
+from ..models.premises_model import Premise, PremiseAddress, PremiseFeature
+from ..schemas.premises_scheme import (
+    FeatureResponse,
+    FullAddressResponse,
+    PremiseCreate,
+)
 
 
 class PremiseRepo:
@@ -37,9 +41,20 @@ class PremiseRepo:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def create_premise(self, premise_data: PremiseCreate):
+    async def create_premise(
+        self,
+        address: FullAddressResponse,
+        features: FeatureResponse,
+        premise_data: PremiseCreate,
+    ):
+        db_address = PremiseAddress(**address.model_dump())
+        self.session.add(db_address)
+        db_features = PremiseFeature(**features.model_dump())
+        self.session.add(db_features)
         try:
-            db_premise = Premise(**premise_data.model_dump())
+            db_premise = Premise(
+                address=db_address, features=db_features, **premise_data.model_dump()
+            )
             self.session.add(db_premise)
             await self.session.commit()
             await self.session.refresh(db_premise)
