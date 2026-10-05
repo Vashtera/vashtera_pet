@@ -17,7 +17,6 @@ class PremiseRepo:
             .where(Premise.id == premise_id)
             .options(
                 selectinload(Premise.landlord),
-                selectinload(Premise.type),
                 selectinload(Premise.address),
                 selectinload(Premise.feature),
             )
@@ -32,7 +31,6 @@ class PremiseRepo:
             .where(PremiseAddress.city == premise_city)
             .options(
                 selectinload(Premise.landlord),
-                selectinload(Premise.type),
                 selectinload(Premise.address),
                 selectinload(Premise.feature),
             )
