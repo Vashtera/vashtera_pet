@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ORMBase(BaseModel):
@@ -24,11 +24,11 @@ class LandlordResponse(ORMBase):
 
 
 class TypeResponse(ORMBase):
-    is_countryHouse: bool
-    is_warehouse: bool
-    is_house: bool
-    is_apartments: bool
-    is_commercialPremise: bool
+    is_countryHouse: bool = Field(default=False)
+    is_warehouse: bool = Field(default=False)
+    is_house: bool = Field(default=False)
+    is_apartments: bool = Field(default=False)
+    is_commercialPremise: bool = Field(default=False)
 
 
 class FeatureResponse(ORMBase):

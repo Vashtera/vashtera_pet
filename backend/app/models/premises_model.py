@@ -10,15 +10,7 @@ class Premise(Base):
     __tablename__ = "premises"
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
-    type_id: Mapped[int] = mapped_column(
-        ForeignKey("premise_type.id"),
-        nullable=False,
-        index=True,
-    )
-    type: Mapped["PremiseType"] = relationship(
-        back_populates="premise",
-        foreign_keys=[type_id],
-    )
+
     landlord_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
@@ -29,6 +21,7 @@ class Premise(Base):
         single_parent=True,
         foreign_keys=[landlord_id],
     )
+
     address_id: Mapped[int] = mapped_column(
         ForeignKey("premise_address.id"), index=True, nullable=False
     )
@@ -42,6 +35,7 @@ class Premise(Base):
     )
     views: Mapped[int] = mapped_column(default=0, nullable=False)
     description: Mapped[str | None] = mapped_column(TEXT)
+
     feature_id: Mapped[int] = mapped_column(
         ForeignKey("premise_feature.id"), index=True, nullable=False
     )
@@ -53,17 +47,11 @@ class Premise(Base):
     status: Mapped[str] = mapped_column(String, default="pending")
     contact_number: Mapped[str] = mapped_column(String(12), nullable=False)
 
-
-class PremiseType(Base):
-    __tablename__ = "premise_type"
-
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     is_apartments: Mapped[bool] = mapped_column(default=False)
     is_house: Mapped[bool] = mapped_column(default=False)
     is_countryHouse: Mapped[bool] = mapped_column(default=False)
     is_commercialPremise: Mapped[bool] = mapped_column(default=False)
     is_warehouse: Mapped[bool] = mapped_column(default=False)
-    premise: Mapped["Premise"] = relationship(back_populates="type")
 
 
 class PremiseAddress(Base):

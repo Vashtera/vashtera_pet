@@ -1,8 +1,10 @@
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from ..models.premises_model import Premise, PremiseAddress
+from ..schemas.premises_scheme import PremiseCreate
 
 
 class PremiseRepo:
@@ -37,3 +39,13 @@ class PremiseRepo:
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def create_premise(self, premise_data: PremiseCreate):
+        try:
+            db_premise = Premise(**premise_data.model_dump())
+            self.session.add(db_premise)
+            await self.session.commit()
+            await self.session.refresh(db_premise)
+        except Exception as e:
+            await self.session.rollback()
+            raise e  # noqa: TRY201
