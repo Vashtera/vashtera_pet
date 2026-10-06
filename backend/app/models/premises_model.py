@@ -47,11 +47,10 @@ class Premise(Base):
     status: Mapped[str] = mapped_column(String, default="pending")
     contact_number: Mapped[str] = mapped_column(String(12), nullable=False)
 
-    is_apartments: Mapped[bool] = mapped_column(default=False)
-    is_house: Mapped[bool] = mapped_column(default=False)
-    is_countryHouse: Mapped[bool] = mapped_column(default=False)
-    is_commercialPremise: Mapped[bool] = mapped_column(default=False)
-    is_warehouse: Mapped[bool] = mapped_column(default=False)
+    premise_type: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
 
 
 class PremiseAddress(Base):

@@ -53,7 +53,7 @@ class PremiseRepo:
         self.session.add(db_features)
         try:
             db_premise = Premise(
-                address=db_address, features=db_features, **premise_data.model_dump()
+                address=db_address, feature=db_features, **premise_data.model_dump()
             )
             self.session.add(db_premise)
             await self.session.commit()
