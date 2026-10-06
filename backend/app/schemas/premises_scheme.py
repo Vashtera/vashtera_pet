@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class ORMBase(BaseModel):
@@ -23,14 +24,6 @@ class LandlordResponse(ORMBase):
     image_file: str | None = None
 
 
-class TypeResponse(ORMBase):
-    is_countryHouse: bool = Field(default=False)
-    is_warehouse: bool = Field(default=False)
-    is_house: bool = Field(default=False)
-    is_apartments: bool = Field(default=False)
-    is_commercialPremise: bool = Field(default=False)
-
-
 class FeatureResponse(ORMBase):
     image: str | None = None
     floor: int | None
@@ -47,7 +40,7 @@ class PremiseResponse(ORMBase):
     status: str
     address: FullAddressResponse
     landlord: LandlordResponse
-    type: TypeResponse
+    type: str
     feature: FeatureResponse
 
 
@@ -55,12 +48,12 @@ class ShortPremiseResponse(ORMBase):
     id: int
     views: int
     created_at: datetime
-    type: TypeResponse
+    type: str
     feature: FeatureResponse
     address: ShortAddressResponse
 
 
 class PremiseCreate(ORMBase):
-    type: TypeResponse
+    type: Literal["apartments", "house", "country_house", "commercial", "warehouse"]
     description: str | None
     contact_number: str
