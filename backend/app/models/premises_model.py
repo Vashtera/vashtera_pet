@@ -33,7 +33,7 @@ class Premise(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
     )
-    views: Mapped[int] = mapped_column(default=0, nullable=False)
+    views: Mapped[int] = mapped_column(default=0)
     description: Mapped[str | None] = mapped_column(TEXT)
 
     feature_id: Mapped[int] = mapped_column(

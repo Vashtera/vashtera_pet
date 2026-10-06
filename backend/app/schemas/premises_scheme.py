@@ -54,6 +54,8 @@ class ShortPremiseResponse(ORMBase):
 
 
 class PremiseCreate(ORMBase):
-    type: Literal["apartments", "house", "country_house", "commercial", "warehouse"]
+    premise_type: Literal[
+        "apartments", "house", "country_house", "commercial", "warehouse"
+    ]
     description: str | None
     contact_number: str
