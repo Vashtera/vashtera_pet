@@ -1,8 +1,7 @@
-from typing import Optional
-
-from app.models.users_model import User
-from sqlalchemy import func, select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..models.users_model import User
 
 
 class UserRepo:

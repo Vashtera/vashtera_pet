@@ -4,14 +4,15 @@ from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
-from core.config import settings
-from database import get_db
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from models.users_model import User
 from pwdlib import PasswordHash
-from repositories.users_repo import UserRepo
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from .core.config import settings
+from .database import get_db
+from .models.users_model import User
+from .repositories.users_repo import UserRepo
 
 password_hash = PasswordHash.recommended()
 

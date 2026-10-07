@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
+from ..auth import CurrentUser
 from ..database import get_db
 from ..schemas.premises_scheme import (
     FeatureResponse,
@@ -42,6 +43,7 @@ async def create_premise(
     address: FullAddressResponse,
     features: FeatureResponse,
     premise_data: PremiseCreate,
+    current_user: CurrentUser,
     db: PremiseService = Depends(get_premise_service),
 ):
     return await db.create_premise(address, features, premise_data)
