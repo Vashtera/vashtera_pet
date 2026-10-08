@@ -25,10 +25,7 @@ class User(Base):
         cascade="all, delete-orphan",
     )
     balance: Mapped[float] = mapped_column(Float, default=0)
-    role_id: Mapped[int] = mapped_column(
-        ForeignKey("roles.id"), index=True, nullable=False
-    )
-    role: Mapped["Roles"] = relationship(back_populates="user", foreign_keys=[role_id])
+    role: Mapped[str] = mapped_column(String, default="user")
     user_premises: Mapped[list["Premise"]] = relationship(
         back_populates="landlord",
         cascade="all, delete-orphan",
@@ -59,14 +56,3 @@ class PasswordResetToken(Base):
     user: Mapped["User"] = relationship(
         back_populates="reset_tokens",
     )
-
-
-class Roles(Base):
-    __tablename__ = "roles"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    is_landlord: Mapped[bool] = mapped_column(default=False)
-    is_modDisputes: Mapped[bool] = mapped_column(default=False)
-    is_modListings: Mapped[bool] = mapped_column(default=False)
-    is_superMod: Mapped[bool] = mapped_column(default=False)
-    user: Mapped["User"] = relationship(back_populates="role")
