@@ -13,8 +13,8 @@ from ..services.users_service import UserService
 router = APIRouter()
 
 
-async def get_user_service(session=Depends(get_db)):
-    return await UserService(session)
+def get_user_service(session=Depends(get_db)):
+    return UserService(session)
 
 
 @router.post("", response_model=UserPrivate)

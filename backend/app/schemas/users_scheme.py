@@ -7,6 +7,7 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
+    contact_number: str
     password: str = Field(min_length=8)
 
 

@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from .database import engine
 from .routers.premises import router as premise_router
+from .routers.users import router as users_router
 
 
 @asynccontextmanager
@@ -15,3 +16,4 @@ async def lifespan(_app: FastAPI):
 app = FastAPI()
 
 app.include_router(premise_router, prefix="/premises")
+app.include_router(users_router, prefix="/users")
