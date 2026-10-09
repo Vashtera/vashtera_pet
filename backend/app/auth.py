@@ -82,7 +82,7 @@ async def get_current_user(
         )
 
     user_repo = UserRepo(db)
-    user = user_repo.get_user_by_id(user_id_int)
+    user = await user_repo.get_user_by_id(user_id_int)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

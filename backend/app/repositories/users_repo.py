@@ -16,7 +16,7 @@ class UserRepo:
         return result.scalars().first()
 
     async def get_user_by_email(self, users_email: str):
-        stmt = select(User).where(User.email == users_email)
+        stmt = select(User).where(User.email == users_email.lower())
         result = await self.session.execute(stmt)
         return result.scalars().first()
 

@@ -36,7 +36,8 @@ class UserService:
         user = await self.session.get_user_by_email(form_data.username)
         if not user or not verify_password(form_data.password, user.password_hash):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="User or password not exist",
+                headers={"WWW-Authenticate": "Bearer"},
             )
         return user
