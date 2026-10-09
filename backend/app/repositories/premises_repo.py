@@ -45,6 +45,7 @@ class PremiseRepo:
         self,
         address: FullAddressResponse,
         features: FeatureResponse,
+        landlord: int,
         premise_data: PremiseCreate,
     ):
         db_address = PremiseAddress(**address.model_dump())
@@ -55,13 +56,14 @@ class PremiseRepo:
             db_premise = Premise(
                 address=db_address,
                 feature=db_features,
-                # TEMPORARY
-                landlord_id=3,
+                landlord_id=landlord,
                 **premise_data.model_dump(),
             )
             self.session.add(db_premise)
             await self.session.commit()
             await self.session.refresh(db_premise)
+            premise = await self.get_premise_by_id(db_premise.id)
+            return premise
         except Exception as e:
             await self.session.rollback()
             raise e  # noqa: TRY201

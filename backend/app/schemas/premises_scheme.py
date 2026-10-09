@@ -40,7 +40,7 @@ class PremiseResponse(ORMBase):
     status: str
     address: FullAddressResponse
     landlord: LandlordResponse
-    type: str
+    premise_type: str
     feature: FeatureResponse
 
 
@@ -48,7 +48,7 @@ class ShortPremiseResponse(ORMBase):
     id: int
     views: int
     created_at: datetime
-    type: str
+    premise_type: str
     feature: FeatureResponse
     address: ShortAddressResponse
 

@@ -38,7 +38,9 @@ async def get_premises_by_city(
     return await db.get_premises_by_city(premise_city)
 
 
-@router.post("/new", response_model=PremiseCreate, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/new", response_model=PremiseResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_premise(
     address: FullAddressResponse,
     features: FeatureResponse,
@@ -46,4 +48,4 @@ async def create_premise(
     current_user: CurrentUser,
     db: PremiseService = Depends(get_premise_service),
 ):
-    return await db.create_premise(address, features, premise_data)
+    return await db.create_premise(address, features, current_user.id, premise_data)

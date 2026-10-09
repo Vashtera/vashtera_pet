@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..repositories.premises_repo import PremiseRepo
+from ..repositories.users_repo import UserRepo
 from ..schemas.premises_scheme import (
     FeatureResponse,
     FullAddressResponse,
@@ -35,7 +36,10 @@ class PremiseService:
         self,
         address: FullAddressResponse,
         features: FeatureResponse,
+        landlord_id: int,
         premise_data: PremiseCreate,
     ):
-        premise = await self.session.create_premise(address, features, premise_data)
+        premise = await self.session.create_premise(
+            address, features, landlord_id, premise_data
+        )
         return premise
