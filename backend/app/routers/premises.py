@@ -53,5 +53,8 @@ async def create_premise(
 
 @router.delete("/{premise_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_premise(
-    premise_id: int, db: PremiseService = Depends(get_premise_service)
-): ...
+    premise_id: int,
+    current_user: CurrentUser,
+    db: PremiseService = Depends(get_premise_service),
+):
+    await db.delete_premise(premise_id, current_user)
