@@ -57,4 +57,4 @@ async def delete_premise(
     current_user: CurrentUser,
     db: PremiseService = Depends(get_premise_service),
 ):
-    await db.delete_premise(premise_id, current_user)
+    await db.delete_premise(premise_id, current_user.id)
