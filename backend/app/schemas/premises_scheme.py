@@ -64,6 +64,7 @@ class PremiseCreate(ORMBase):
 class PremiseUpdate(ORMBase):
     contact_number: str | None
     description: str | None
-    address: FullAddressResponse | None
-    premise_type: str | None
-    feature: FeatureResponse | None
+    premise_type: (
+        Literal["apartments", "house", "country_house", "commercial", "warehouse"]
+        | None
+    )
