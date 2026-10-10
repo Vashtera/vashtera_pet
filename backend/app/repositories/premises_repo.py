@@ -67,3 +67,8 @@ class PremiseRepo:
         except Exception as e:
             await self.session.rollback()
             raise e  # noqa: TRY201
+
+    async def delete_premise(self, premise_id: int):
+        premise = await self.get_premise_by_id(premise_id)
+        await self.session.delete(premise)
+        await self.session.commit()
