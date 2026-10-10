@@ -84,7 +84,8 @@ class PremiseRepo:
         await self.session.commit()
 
     async def update_premise_by_id(self, premise_id: int, premise_data: PremiseUpdate):
-        premise = self.get_premise_by_id(premise_id)
+        premise = await self.get_premise_by_id(premise_id)
+        # exclude_unset - used to modify only those parameters passed by the user
         update_data = premise_data.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(premise, field, value)
