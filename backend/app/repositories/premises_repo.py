@@ -15,6 +15,15 @@ class PremiseRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    async def get_all_premises(self):
+        stmt = select(Premise).options(
+            selectinload(Premise.landlord),
+            selectinload(Premise.address),
+            selectinload(Premise.feature),
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
     async def get_premise_by_id(self, premise_id: int):
         stmt = (
             select(Premise)
