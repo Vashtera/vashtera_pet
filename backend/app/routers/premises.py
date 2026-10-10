@@ -20,6 +20,13 @@ def get_premise_service(session=Depends(get_db)):
 
 
 @router.get(
+    "", response_model=list[ShortPremiseResponse], status_code=status.HTTP_200_OK
+)
+async def get_all_premises(db: PremiseService = Depends(get_premise_service)):
+    return await db.get_all_premises()
+
+
+@router.get(
     "/{premise_id}", response_model=PremiseResponse, status_code=status.HTTP_200_OK
 )
 async def get_premise_by_id(
