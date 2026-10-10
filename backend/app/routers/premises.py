@@ -7,6 +7,7 @@ from ..schemas.premises_scheme import (
     FullAddressResponse,
     PremiseCreate,
     PremiseResponse,
+    PremiseUpdate,
     ShortPremiseResponse,
 )
 from ..services.premises_service import PremiseService
@@ -58,3 +59,15 @@ async def delete_premise(
     db: PremiseService = Depends(get_premise_service),
 ):
     await db.delete_premise(premise_id, current_user.id)
+
+
+@router.patch(
+    "/{premise_id}", response_model=PremiseResponse, status_code=status.HTTP_200_OK
+)
+async def update_premise(
+    premise_id: int,
+    premise_data: PremiseUpdate,
+    current_user: CurrentUser,
+    db: PremiseService = Depends(get_premise_service),
+):
+    return await db.update_premise_by_id(premise_id, premise_data, current_user.id)
