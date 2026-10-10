@@ -7,6 +7,7 @@ from ..schemas.premises_scheme import (
     FeatureResponse,
     FullAddressResponse,
     PremiseCreate,
+    PremiseUpdate,
 )
 
 
@@ -59,3 +60,22 @@ class PremiseService:
             )
 
         await self.session.delete_premise_by_id(premise_id)
+
+    async def update_premise_by_id(
+        self, premise_id: int, premise_data: PremiseUpdate, user_id: int
+    ):
+        premise = await self.session.get_premise_by_id(premise_id)
+        if not premise:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Premise not found",
+            )
+
+        if premise.landlord_id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Premise not found",
+            )
+
+        await self.session.update_premise_by_id(premise_id, premise_data)
+        return premise

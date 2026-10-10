@@ -7,6 +7,7 @@ from ..schemas.premises_scheme import (
     FeatureResponse,
     FullAddressResponse,
     PremiseCreate,
+    PremiseUpdate,
 )
 
 
@@ -72,3 +73,13 @@ class PremiseRepo:
         premise = await self.get_premise_by_id(premise_id)
         await self.session.delete(premise)
         await self.session.commit()
+
+    async def update_premise_by_id(self, premise_id: int, premise_data: PremiseUpdate):
+        premise = self.get_premise_by_id(premise_id)
+        update_data = premise_data.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(premise, field, value)
+
+        await self.session.commit()
+        await self.session.refresh(premise, attribute_names=["landlord"])
+        return premise
