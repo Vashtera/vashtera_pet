@@ -15,6 +15,9 @@ class PremiseService:
     def __init__(self, db: AsyncSession):
         self.session = PremiseRepo(db)
 
+    async def get_all_premises(self):
+        return await self.session.get_all_premises()
+
     async def get_premise_by_id(self, premise_id: int):
         premise = await self.session.get_premise_by_id(premise_id)
         if not premise:
