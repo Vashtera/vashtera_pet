@@ -59,3 +59,11 @@ class PremiseCreate(ORMBase):
     ]
     description: str | None
     contact_number: str
+
+
+class PremiseUpdate(ORMBase):
+    contact_number: str | None
+    description: str | None
+    address: FullAddressResponse | None
+    premise_type: str | None
+    feature: FeatureResponse | None
