@@ -80,5 +80,11 @@ class PremiseService:
                 detail="Premise not found",
             )
 
+        if status.HTTP_422_UNPROCESSABLE_CONTENT:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="Invalid premise type",
+            )
+
         await self.session.update_premise_by_id(premise_id, premise_data)
         return premise
