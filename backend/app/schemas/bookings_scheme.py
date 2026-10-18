@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -23,7 +24,7 @@ class BookingResponse(ORMBase):
     landlord: UserPublic
     date_from: datetime
     date_to: datetime
-    status: str
+    status: Literal["pending", "approve", "reject"]
     payment: str
     created_at: datetime
 
