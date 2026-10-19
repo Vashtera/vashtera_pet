@@ -9,4 +9,12 @@ class BookingService:
     def __init__(self, db: AsyncSession):
         self.session = BookingRepo(db)
 
+    async def check_coflicts_service(self, booking: BookingCreate):
+        conflicts = await self.session.check_conflict(booking)
+        if conflicts:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="The selected time range is conflicts with an existing bookings for this time",
+            )
+
     async def create_booking(self, booking: BookingCreate): ...
