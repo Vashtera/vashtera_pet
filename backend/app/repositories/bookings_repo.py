@@ -16,5 +16,5 @@ class BookingRepo:
             await self.session.refresh(Booking)
             return booking
         except Exception:
-            self.session.rollback()
+            await self.session.rollback()
             raise
