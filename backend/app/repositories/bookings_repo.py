@@ -12,8 +12,8 @@ class BookingRepo:
     async def create_booking(self, booking: Booking):
         try:
             self.session.add(Booking)
-            self.session.commit()
-            self.session.refresh(Booking)
+            await self.session.commit()
+            await self.session.refresh(Booking)
             return booking
         except Exception:
             self.session.rollback()
