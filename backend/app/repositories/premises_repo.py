@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from ..models.premises_model import Premise, PremiseAddress, PremiseFeature
+from ..models.users_model import User
 from ..schemas.premises_scheme import (
     FeatureResponse,
     FullAddressResponse,
@@ -93,3 +94,12 @@ class PremiseRepo:
         await self.session.commit()
         await self.session.refresh(premise, attribute_names=["landlord"])
         return premise
+
+    async def get_premise_landlord(self, premise_id: int):
+        stmt = (
+            select(User)
+            .where(Premise.id == premise_id)
+            .options(selectinload(Premise.landlord))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
