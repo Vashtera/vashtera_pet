@@ -16,8 +16,8 @@ class Booking(Base):
     renter_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False
     )
-    date_from: Mapped[datetime] = mapped_column(DateTime)
-    date_to: Mapped[datetime] = mapped_column(DateTime)
+    date_from: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    date_to: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     # "pending", "approve", "reject"
     status: Mapped[str] = mapped_column(String(64), nullable=False, default="pending")
     payment_id: Mapped[int] = mapped_column(
