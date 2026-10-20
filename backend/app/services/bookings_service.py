@@ -13,7 +13,7 @@ class BookingService:
         conflicts = await self.session.check_conflict(booking)
         if conflicts:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 detail="The selected time range is conflicts with an existing bookings for this time",
             )
 
