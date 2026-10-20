@@ -17,4 +17,6 @@ class BookingService:
                 detail="The selected time range is conflicts with an existing bookings for this time",
             )
 
-    async def create_booking(self, booking: BookingCreate): ...
+    async def create_booking(self, renter_id: int, booking: BookingCreate):
+        await self.check_coflicts_service(booking)
+        return await self.session.create_booking(renter_id, booking)
