@@ -13,8 +13,8 @@ class BookingRepo:
     async def check_conflict(self, booking: BookingCreate):
         stmt = select(Booking).where(
             Booking.premise_id == booking.premise_id,
-            Booking.date_to < booking.date_from,
-            Booking.date_from > booking.date_to,
+            Booking.date_to > booking.date_from,
+            Booking.date_from < booking.date_to,
         )
         conflicts = await self.session.execute(stmt)
         return conflicts.scalar_one_or_none()
