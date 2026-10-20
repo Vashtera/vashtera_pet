@@ -26,7 +26,7 @@ class BookingRepo:
             date_from=booking.date_from,
             date_to=booking.date_to,
             # TODO TEMPORARY
-            payment_id=3,
+            payment_id=1,
         )
         try:
             self.session.add(db_booking)

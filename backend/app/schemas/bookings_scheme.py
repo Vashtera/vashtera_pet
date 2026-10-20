@@ -12,7 +12,7 @@ class ORMBase(BaseModel):
 
 
 class BookingCreate(ORMBase):
-    premise_id: str
+    premise_id: int
     date_from: datetime
     date_to: datetime
 
