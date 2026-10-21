@@ -1,6 +1,6 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..database import Base
@@ -16,8 +16,8 @@ class Booking(Base):
     renter_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False
     )
-    date_from: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    date_to: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    date_from: Mapped[date] = mapped_column(Date, nullable=False)
+    date_to: Mapped[date] = mapped_column(Date, nullable=False)
     # "pending", "approve", "reject"
     status: Mapped[str] = mapped_column(String(64), nullable=False, default="pending")
     payment_id: Mapped[int] = mapped_column(
