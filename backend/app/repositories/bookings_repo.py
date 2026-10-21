@@ -10,16 +10,16 @@ class BookingRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def check_conflict(self, booking: BookingCreate):
+    async def check_conflict(self, booking: BookingCreate) -> Booking | None:
         stmt = select(Booking).where(
             Booking.premise_id == booking.premise_id,
-            Booking.date_to > booking.date_from,
-            Booking.date_from < booking.date_to,
+            Booking.during[2] > booking.date_from,
+            Booking.during[1] < booking.date_to,
         )
         conflicts = await self.session.execute(stmt)
         return conflicts.scalar_one_or_none()
 
-    async def create_booking(self, renter_id: int, booking: BookingCreate):
+    async def create_booking(self, renter_id: int, booking: BookingCreate) -> Booking:
         db_booking = Booking(
             premise_id=booking.premise_id,
             renter_id=renter_id,

@@ -1,6 +1,7 @@
 from datetime import UTC, date, datetime
 
 from sqlalchemy import Date, DateTime, ForeignKey, String
+from sqlalchemy.dialects.postgresql import TSRANGE, ExcludeConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..database import Base
@@ -16,8 +17,7 @@ class Booking(Base):
     renter_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False
     )
-    date_from: Mapped[date] = mapped_column(Date, nullable=False)
-    date_to: Mapped[date] = mapped_column(Date, nullable=False)
+    during: Mapped[TSRANGE] = mapped_column(TSRANGE, nullable=False)
     # "pending", "approve", "reject"
     status: Mapped[str] = mapped_column(String(64), nullable=False, default="pending")
     payment_id: Mapped[int] = mapped_column(
@@ -27,3 +27,5 @@ class Booking(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
     )
+
+    __table_args__ = (ExcludeConstraint(("premise_id", "="), ("during", "&&")),)
