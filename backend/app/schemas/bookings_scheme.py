@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
@@ -13,16 +13,16 @@ class ORMBase(BaseModel):
 
 class BookingCreate(ORMBase):
     premise_id: int
-    date_from: datetime
-    date_to: datetime
+    date_from: date
+    date_to: date
 
 
 class BookingResponse(ORMBase):
     id: int
     premise: ShortPremiseResponse
     landlord: UserPublic
-    date_from: datetime
-    date_to: datetime
+    date_from: date
+    date_to: date
     status: Literal["pending", "approve", "reject"]
     payment: str
     created_at: datetime
