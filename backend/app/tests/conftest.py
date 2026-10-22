@@ -4,12 +4,12 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./test_shop.db"
 os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
 
 import pytest
-from app.database import Base
-from app.main import app
-from database import get_db
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
+
+from ..database import Base, get_db
+from ..main import app
 
 
 @pytest.fixture(scope="session")
@@ -60,10 +60,10 @@ async def client(db_session: AsyncSession):
 async def clean_database(db_session):
     from sqlalchemy import delete
 
-    from app.models.users_model import User, PasswordResetToken,
-    from app.models.premises_model import Premise, PremiseAddress, PremiseFeature
-    from app.models.bookings_model import Booking
-    from app.models.payments_model import Payment
+    from ..models.bookings_model import Booking
+    from ..models.payments_model import Payment
+    from ..models.premises_model import Premise, PremiseAddress, PremiseFeature
+    from ..models.users_model import PasswordResetToken, User
 
     yield
 
