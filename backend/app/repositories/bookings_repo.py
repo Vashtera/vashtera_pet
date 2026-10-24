@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -13,8 +13,8 @@ class BookingRepo:
     async def check_conflict(self, booking: BookingCreate) -> Booking | None:
         stmt = select(Booking).where(
             Booking.premise_id == booking.premise_id,
-            Booking.during[2] > booking.date_from,
-            Booking.during[1] < booking.date_to,
+            func.upper(Booking.during) > booking.date_from,
+            func.lower(Booking.during) < booking.date_to,
         )
         conflicts = await self.session.execute(stmt)
         return conflicts.scalar_one_or_none()
