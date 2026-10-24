@@ -18,6 +18,10 @@ class FullAddressResponse(ShortAddressResponse):
     house_number: int | None
 
 
+class AddressCreate(FullAddressResponse):
+    pass
+
+
 class LandlordResponse(ORMBase):
     id: int
     username: str
@@ -30,6 +34,10 @@ class FeatureResponse(ORMBase):
     area: float
     rooms: int
     price: int
+
+
+class FeatureCreate(FeatureResponse):
+    pass
 
 
 class PremiseResponse(ORMBase):

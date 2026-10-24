@@ -50,8 +50,6 @@ class BookingRepo:
             renter_id=renter_id,
             # Substitution into the booking date range
             during=Range(booking.date_from, booking.date_to),
-            # TODO TEMPORARY
-            payment_id=3,
         )
         try:
             self.session.add(db_booking)

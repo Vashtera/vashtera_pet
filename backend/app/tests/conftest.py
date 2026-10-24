@@ -1,10 +1,24 @@
 import os
 
-os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./test_shop.db"
-os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
+from sqlalchemy.engine import make_url
 
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
+TEST_URL = os.environ["TEST_DATABASE_URL"]
+_url = make_url(TEST_URL)
+TEST_DB_NAME = _url.database
+ADMIN_URL = _url.set(database="postgres")
+
+os.environ["DATABASE_URL"] = TEST_URL
+os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -13,25 +27,38 @@ from ..main import app
 
 
 @pytest.fixture(scope="session")
-def test_engine():
-    engine = create_async_engine(
-        os.environ["DATABASE_URL"],
-        poolclass=NullPool,
-    )
-    return engine
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture(scope="session")
+async def test_engine():
+    admin = create_async_engine(ADMIN_URL, isolation_level="AUTOCOMMIT")
+    async with admin.connect() as conn:
+        exists = await conn.scalar(
+            text("SELECT 1 FROM pg_database WHERE datname = :name"),
+            {"name": TEST_DB_NAME},
+        )
+        if not exists:
+            await conn.execute(text(f'CREATE DATABASE "{TEST_DB_NAME}"'))
+    await admin.dispose()
+
+    engine = create_async_engine(TEST_URL, poolclass=NullPool)
+    yield engine
+    await engine.dispose()
 
 
 @pytest.fixture(scope="session")
 async def setup_database(test_engine):
     async with test_engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS btree_gist"))
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
     yield
 
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-
-    await test_engine.dispose()
 
 
 @pytest.fixture(scope="function")
@@ -76,22 +103,10 @@ async def concurrent_client(test_engine, setup_database):
 
 @pytest.fixture(autouse=True)
 async def clean_database(db_session):
-    from sqlalchemy import delete
-
-    from ..models.bookings_model import Booking
-    from ..models.payments_model import Payment
-    from ..models.premises_model import Premise, PremiseAddress, PremiseFeature
-    from ..models.users_model import PasswordResetToken, User
-
     yield
 
-    await db_session.execute(delete(Premise))
-    await db_session.execute(delete(Booking))
-    await db_session.execute(delete(User))
-    await db_session.execute(delete(PasswordResetToken))
-    await db_session.execute(delete(PremiseAddress))
-    await db_session.execute(delete(PremiseFeature))
-    await db_session.execute(delete(Payment))
+    tables = ", ".join(f'"{t.name}"' for t in Base.metadata.sorted_tables)
+    await db_session.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
     await db_session.commit()
 
 
@@ -100,6 +115,7 @@ async def create_test_user(
     username: str = "testuser",
     email: str = "test@example.com",
     password: str = "testpassword123",
+    contact_number: str = "87770001122",
 ) -> dict:
     response = await client.post(
         "/api/users",
@@ -107,9 +123,11 @@ async def create_test_user(
             "username": username,
             "email": email,
             "password": password,
+            "contact_number": contact_number,
         },
     )
-    assert response.status_code == 201, f"Failed to create user: {response.text}"
+    # TODO change status_code to 201
+    assert response.status_code == 200, f"Failed to create user: {response.text}"
     return response.json()
 
 

@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, status
 from ..auth import CurrentUser
 from ..database import get_db
 from ..schemas.premises_scheme import (
-    FeatureResponse,
-    FullAddressResponse,
+    AddressCreate,
+    FeatureCreate,
     PremiseCreate,
     PremiseResponse,
     PremiseUpdate,
@@ -50,8 +50,8 @@ async def get_premises_by_city(
     "/new", response_model=PremiseResponse, status_code=status.HTTP_201_CREATED
 )
 async def create_premise(
-    address: FullAddressResponse,
-    features: FeatureResponse,
+    address: AddressCreate,
+    features: FeatureCreate,
     premise_data: PremiseCreate,
     current_user: CurrentUser,
     db: PremiseService = Depends(get_premise_service),
