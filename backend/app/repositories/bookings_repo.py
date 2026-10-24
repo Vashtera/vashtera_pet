@@ -1,4 +1,5 @@
-from sqlalchemy import func, select
+from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -11,20 +12,44 @@ class BookingRepo:
         self.session = session
 
     async def check_conflict(self, booking: BookingCreate) -> Booking | None:
+        """
+        Checking for date overlap conflicts by premise_id
+
+        Args:
+            booking: the booking creation schema contains `premise_id`, `date_from`, and `date_to`
+
+        Returns:
+            Booking model or `None`
+        """
         stmt = select(Booking).where(
+            # Check by premise_id
             Booking.premise_id == booking.premise_id,
-            func.upper(Booking.during) > booking.date_from,
-            func.lower(Booking.during) < booking.date_to,
+            # Checking for date overlap conflicts
+            Booking.during.overlaps(
+                Range(booking.date_from, booking.date_to, bounds="[)")
+            ),
         )
         conflicts = await self.session.execute(stmt)
         return conflicts.scalar_one_or_none()
 
-    async def create_booking(self, renter_id: int, booking: BookingCreate) -> Booking:
+    async def create_booking(
+        self, renter_id: int, booking: BookingCreate
+    ) -> Booking | None:
+        """
+        Creating a booking for an authenticated user
+
+        Args:
+            renter_id: is the ID of the user who wants to book the premises
+            booking: the booking creation schema contains `premise_id`, `date_from`, and `date_to`
+
+        Returns:
+            Booking model or `None` if an exception occurs, the entire transaction will be rolled back
+        """
         db_booking = Booking(
             premise_id=booking.premise_id,
             renter_id=renter_id,
-            date_from=booking.date_from,
-            date_to=booking.date_to,
+            # Substitution into the booking date range
+            during=Range(booking.date_from, booking.date_to),
             # TODO TEMPORARY
             payment_id=3,
         )
