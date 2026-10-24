@@ -10,6 +10,11 @@ class BookingService:
         self.session = BookingRepo(db)
 
     async def check_coflicts_service(self, booking: BookingCreate):
+        if booking.date_from == booking.date_to:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid bad request",
+            )
         conflicts = await self.session.check_conflict(booking)
         if conflicts:
             raise HTTPException(
