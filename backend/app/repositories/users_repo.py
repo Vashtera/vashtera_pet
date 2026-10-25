@@ -26,12 +26,16 @@ class UserRepo:
         return result.scalars().first()
 
     async def create_user(self, user_data: UserCreate) -> User:
-        new_user = User(
-            username=user_data.username,
-            email=user_data.email,
-            password_hash=hash_password(user_data.password),
-        )
-        self.session.add(new_user)
-        await self.session.commit()
-        await self.session.refresh(new_user)
-        return new_user
+        try:
+            new_user = User(
+                username=user_data.username,
+                email=user_data.email,
+                password_hash=hash_password(user_data.password),
+            )
+            self.session.add(new_user)
+            await self.session.commit()
+            await self.session.refresh(new_user)
+            return new_user
+        except Exception:
+            self.session.rollback()
+            raise
