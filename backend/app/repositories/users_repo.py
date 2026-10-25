@@ -37,5 +37,5 @@ class UserRepo:
             await self.session.refresh(new_user)
             return new_user
         except Exception:
-            self.session.rollback()
+            await self.session.rollback()
             raise
