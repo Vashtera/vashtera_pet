@@ -1,6 +1,13 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import DECIMAL, TEXT, DateTime, Float, ForeignKey, String
+from sqlalchemy import (
+    DECIMAL,
+    TEXT,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -72,5 +79,5 @@ class PremiseFeature(Base):
     floor: Mapped[int | None] = mapped_column(nullable=True, default=1)
     rooms: Mapped[int | None] = mapped_column(nullable=True)
     area: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
-    price: Mapped[float] = mapped_column(Float, nullable=False)
+    price: Mapped[int] = mapped_column(Integer, nullable=False)
     premise: Mapped["Premise"] = relationship(back_populates="feature")
