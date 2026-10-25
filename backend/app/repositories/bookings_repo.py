@@ -45,13 +45,13 @@ class BookingRepo:
         Returns:
             Booking model or `None` if an exception occurs, the entire transaction will be rolled back
         """
-        db_booking = Booking(
-            premise_id=booking.premise_id,
-            renter_id=renter_id,
-            # Substitution into the booking date range
-            during=Range(booking.date_from, booking.date_to),
-        )
         try:
+            db_booking = Booking(
+                premise_id=booking.premise_id,
+                renter_id=renter_id,
+                # Substitution into the booking date range
+                during=Range(booking.date_from, booking.date_to),
+            )
             self.session.add(db_booking)
             await self.session.commit()
             await self.session.refresh(db_booking)

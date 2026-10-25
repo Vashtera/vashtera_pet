@@ -50,7 +50,7 @@ class Premise(Base):
         back_populates="premise",
         foreign_keys=[feature_id],
     )
-    # available, booked, archived, cancelled, pending
+    # available, archived, cancelled, pending
     status: Mapped[str] = mapped_column(String, default="pending")
     contact_number: Mapped[str] = mapped_column(String(12), nullable=False)
 
