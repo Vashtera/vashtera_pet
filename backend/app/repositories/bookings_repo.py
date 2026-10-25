@@ -24,7 +24,7 @@ class BookingRepo:
         stmt = select(Booking).where(
             # Check by premise_id
             Booking.premise_id == booking.premise_id,
-            # Checking for date overlap conflicts
+            # Check for date overlap conflicts
             Booking.during.overlaps(
                 Range(booking.date_from, booking.date_to, bounds="[)")
             ),
