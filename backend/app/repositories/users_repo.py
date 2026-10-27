@@ -77,3 +77,5 @@ class UserRepo:
         except Exception:
             await self.session.rollback()
             raise
+
+    async def top_up_balance(self, user_id: int, sum: )
