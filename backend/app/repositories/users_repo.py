@@ -1,9 +1,9 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.security import hash_password
 from ..models.users_model import User
-from ..schemas.users_scheme import UserCreate
+from ..schemas.users_scheme import UserCreate, UserTopUpBalance
 
 
 class UserRepo:
@@ -78,4 +78,18 @@ class UserRepo:
             await self.session.rollback()
             raise
 
-    async def top_up_balance(self, user_id: int, sum: )
+    async def top_up_balance(self, user_id: int, amount: UserTopUpBalance) -> None:
+        """
+        Topping up the user's balance
+
+        Args:
+            user_id: the ID of the user who wants to top up their balance
+            amount: a schema containing only the top-up amount, which must be greater than 0
+        """
+        stmt = (
+            update(User)
+            .where(User.id == user_id)
+            .values(balance=User.balance + amount.sum)
+        )
+        await self.session.execute(stmt)
+        await self.session.commit()
