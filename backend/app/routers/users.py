@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from ..auth import CurrentUser, create_access_token
@@ -38,7 +38,7 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.post("/{user_id}/top-up")
+@router.post("/{user_id}/top-up", status_code=status.HTTP_200_OK)
 async def top_up_balance(
     user: CurrentUser,
     top_up_amount: UserTopUpBalance,

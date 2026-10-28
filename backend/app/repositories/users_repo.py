@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -91,7 +93,7 @@ class UserRepo:
         stmt = (
             update(User)
             .where(User.id == user_id)
-            .values(balance=User.balance + top_up_amount.sum)
+            .values(balance=User.balance + Decimal(f"{top_up_amount.sum}"))
         )
         await self.session.execute(stmt)
         await self.session.commit()
