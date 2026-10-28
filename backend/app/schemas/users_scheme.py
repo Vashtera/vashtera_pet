@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -19,6 +21,7 @@ class UserPrivate(UserBase):
     id: int
     image_file: str | None
     image_path: str
+    balance: Decimal
 
 
 class UserPublic(BaseModel):

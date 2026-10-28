@@ -16,7 +16,7 @@ from .repositories.users_repo import UserRepo
 
 password_hash = PasswordHash.recommended()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/users/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/users/auth/sign-in")
 
 
 def generate_reset_token() -> str:
