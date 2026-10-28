@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
+from decimal import Decimal
 
-from sqlalchemy import DECIMAL, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..core.config import settings
@@ -24,7 +25,7 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
-    balance: Mapped[float] = mapped_column(DECIMAL, default=0)
+    balance: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0"))
     role: Mapped[str] = mapped_column(String, default="user")
     user_premises: Mapped[list["Premise"]] = relationship(
         back_populates="landlord",
