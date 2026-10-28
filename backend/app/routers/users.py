@@ -4,10 +4,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from ..auth import create_access_token
+from ..auth import CurrentUser, create_access_token
 from ..core.config import settings
 from ..database import get_db
-from ..schemas.users_scheme import Token, UserCreate, UserPrivate
+from ..schemas.users_scheme import Token, UserCreate, UserPrivate, UserTopUpBalance
 from ..services.users_service import UserService
 
 router = APIRouter()
@@ -36,3 +36,21 @@ async def login_for_access_token(
         expires_delta=access_token_expires,
     )
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.post("/{user_id}/top-up")
+async def top_up_balance(
+    user: CurrentUser,
+    top_up_amount: UserTopUpBalance,
+    db: UserService = Depends(get_user_service),
+) -> None:
+    """
+    This function is only intended to top up virtual money for
+    the purpose of gaining experience using the platform.
+    In the future, I may add real escrow payments.
+
+    Args:
+        user - this is a registered user who has passed the verification in `auth.py`.
+        top_up_amount - Balance top-up schema containing only the `amount` field
+    """
+    await db.top_up_balance(user.id, top_up_amount)

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.security import verify_password
 from ..repositories.users_repo import UserRepo
-from ..schemas.users_scheme import UserCreate
+from ..schemas.users_scheme import UserCreate, UserTopUpBalance
 
 
 class UserService:
@@ -41,3 +41,13 @@ class UserService:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return user
+
+    async def top_up_balance(
+        self, user_id: int, top_up_amount: UserTopUpBalance
+    ) -> None:
+        if top_up_amount.sum <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="The top-up amount cannot be less than or equal to 0.",
+            )
+        await self.session.top_up_balance(user_id, top_up_amount)

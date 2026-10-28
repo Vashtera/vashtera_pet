@@ -78,7 +78,9 @@ class UserRepo:
             await self.session.rollback()
             raise
 
-    async def top_up_balance(self, user_id: int, amount: UserTopUpBalance) -> None:
+    async def top_up_balance(
+        self, user_id: int, top_up_amount: UserTopUpBalance
+    ) -> None:
         """
         Topping up the user's balance
 
@@ -89,7 +91,7 @@ class UserRepo:
         stmt = (
             update(User)
             .where(User.id == user_id)
-            .values(balance=User.balance + amount.sum)
+            .values(balance=User.balance + top_up_amount.sum)
         )
         await self.session.execute(stmt)
         await self.session.commit()
