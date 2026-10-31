@@ -8,12 +8,14 @@ from sqlalchemy.orm import selectinload
 from ..models.payments_model import Payment
 from ..models.users_model import User
 
+from ..schemas.payments_scheme import PaymentCreate
+
 
 class PaymentRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def balance_deduction(self, user_id: int, deduction_amount: Decimal):
+    async def balance_deduction(self, user_id: int, deduction_amount: Decimal) -> None:
         stmt = (
             update(User)
             .where(User.id == user_id, User.balance >= deduction_amount)
@@ -22,4 +24,4 @@ class PaymentRepo:
         await self.session.execute(stmt)
         await self.session.flush()
 
-    async def create_payment(self, )
+    async def create_payment(self, payment_data: PaymentCreate):

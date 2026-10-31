@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -8,7 +9,7 @@ class PaymentBase(BaseModel):
     from_user: str
     to_landlord: str
     for_premise: str
-    total: float
+    total: Decimal
     created_at: datetime
 
 
