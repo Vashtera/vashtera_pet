@@ -3,18 +3,25 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
+from ..schemas.premises_scheme import PremiseResponse
+from ..schemas.users_scheme import UserPrivate, UserPublic
+
 
 class PaymentBase(BaseModel):
     id: int
-    from_user: str
-    to_landlord: str
-    for_premise: str
+    from_user: UserPrivate
+    to_landlord: UserPublic
+    for_premise: PremiseResponse
     total: Decimal
     created_at: datetime
 
 
-class PaymentCreate(PaymentBase):
-    pass
+class PaymentCreate(BaseModel):
+    from_user: UserPrivate
+    to_landlord: UserPublic
+    for_premise: PremiseResponse
+    total: Decimal
+    created_at: datetime
 
 
 class PaymentResponse(PaymentBase):

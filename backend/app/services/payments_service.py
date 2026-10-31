@@ -11,7 +11,7 @@ class PaymentService:
     def __init__(self, db: AsyncSession):
         self.session = PaymentRepo(db)
 
-    def calculator(self, premise_price: Decimal, during: Range) -> Decimal:
+    def calculator(premise_price: Decimal, during: Range) -> Decimal:
         date_from = during.lower
         date_to = during.upper
         if date_from is None or date_to is None:

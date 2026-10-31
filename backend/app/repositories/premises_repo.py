@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -176,6 +178,15 @@ class PremiseRepo:
             select(User)
             .where(Premise.id == premise_id)
             .options(selectinload(Premise.landlord))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+
+    async def get_premise_price_by_premise_id(self, premise_id: int) -> Decimal:
+        stmt = (
+            select(PremiseFeature.price)
+            .join(PremiseFeature.premise)
+            .where(Premise.id == premise_id)
         )
         result = await self.session.execute(stmt)
         return result.scalars().first()
