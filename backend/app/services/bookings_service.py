@@ -66,11 +66,11 @@ class BookingService:
                 booking.premise_id
             )
 
-            await self.payment_session.balance_deduction(renter_id, premise_price)
-
             total_price = PaymentService.calculator(
                 premise_price, Range(booking.date_from, booking.date_to)
             )
+
+            await self.payment_session.balance_deduction(renter_id, total_price)
 
             payment_data = PaymentCreate(
                 from_user=user,
