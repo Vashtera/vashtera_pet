@@ -21,3 +21,5 @@ class PaymentRepo:
         )
         await self.session.execute(stmt)
         await self.session.flush()
+
+    async def create_payment(self, )

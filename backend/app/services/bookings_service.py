@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..repositories.bookings_repo import BookingRepo
+from ..repositories.payments_repo import PaymentRepo
 from ..schemas.bookings_scheme import BookingCreate
 
 
@@ -31,4 +32,5 @@ class BookingService:
 
     async def create_booking(self, renter_id: int, booking: BookingCreate):
         await self.check_coflicts_service(booking)
+
         return await self.session.create_booking(renter_id, booking)
