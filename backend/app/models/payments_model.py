@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.schema import CheckConstraint
 
 from ..database import Base
 
@@ -28,7 +29,11 @@ class Payment(Base):
         "Premise", foreign_keys="from_user_id"
     )
     token: Mapped[str] = mapped_column(String(64), nullable=False)
-    total: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0"))
+    total: Mapped[Decimal] = mapped_column(
+        Numeric(12, 2),
+        CheckConstraint("total >= 0", name="check_total"),
+        default=Decimal("0"),
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
