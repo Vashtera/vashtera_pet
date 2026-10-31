@@ -15,21 +15,15 @@ class PaymentRepo:
         self.session = session
 
     async def balance_deduction(self, user_id: int, deduction_amount: Decimal):
-        try:
-            stmt = (
-                update(User)
-                .where(User.id == user_id, User.balance >= deduction_amount)
-                .values(balance=User.balance - deduction_amount)
-            )
-            result = await self.session.execute(stmt)
-            await self.session.flush()
-            return result.scalar_one_or_none()
-        except Exception:
-            await self.session.rollback()
+        stmt = (
+            update(User)
+            .where(User.id == user_id, User.balance >= deduction_amount)
+            .values(balance=User.balance - deduction_amount)
+        )
+        result = await self.session.execute(stmt)
+        await self.session.flush()
+        return result.scalar_one_or_none()
 
     async def create_payment(self, payment_data: PaymentCreate):
-        try:
-            Payment(**payment_data.model_dump())
-            await self.session.flush()
-        except Exception:
-            await self.session.rollback()
+        Payment(**payment_data.model_dump())
+        await self.session.flush()
