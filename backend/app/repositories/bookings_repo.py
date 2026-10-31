@@ -53,7 +53,7 @@ class BookingRepo:
                 during=Range(booking.date_from, booking.date_to),
             )
             self.session.add(db_booking)
-            await self.session.commit()
+            await self.session.flush()
             await self.session.refresh(db_booking)
             return db_booking
         except Exception:
