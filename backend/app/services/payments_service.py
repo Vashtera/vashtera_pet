@@ -11,7 +11,26 @@ class PaymentService:
     def __init__(self, db: AsyncSession):
         self.session = PaymentRepo(db)
 
+    @staticmethod
     def calculator(premise_price: Decimal, during: Range) -> Decimal:
+        """Calculates the total price of a stay.
+
+        Multiplies the per-night premise price by the number of nights in the
+        given date range. The number of nights is the difference in days
+        between the upper and lower bounds of the range.
+
+        Args:
+            premise_price (Decimal): Price of the premise per night.
+            during (Range): Date range of the stay, with both a lower bound
+                (check-in) and an upper bound (check-out).
+
+        Returns:
+            Decimal: Total cost of the stay (`premise_price` multiplied by
+                the number of nights).
+
+        Raises:
+            ValueError: If `during` is missing its lower or upper bound.
+        """
         date_from = during.lower
         date_to = during.upper
         if date_from is None or date_to is None:
