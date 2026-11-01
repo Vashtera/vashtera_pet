@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 
 from fastapi import HTTPException, status
 from sqlalchemy.dialects.postgresql import Range
@@ -61,9 +61,11 @@ class BookingService:
             A new booking with an associated payment created for it and the booking marked as paid.
 
         Exceptions:
-            HTTP_404 -
+            HTTP_404 - In case the landlord or the premises do not exist.
+            HTTP_409 - Foreign key, uniqueness, or date constraint violation.
         """
         await self.check_coflicts_service(booking)
+        # First, check for date conflicts and overlapping dates at the database level.
 
         try:
             landlord = await self.premise_session.get_premise_landlord(
@@ -86,8 +88,10 @@ class BookingService:
             total_price = PaymentService.calculator(
                 premise_price, Range(booking.date_from, booking.date_to)
             )
+            # This variable retrieves the total amount by calling a separate function that calculates the number of nights for the booking.
 
             await self.payment_session.balance_deduction(renter_id, total_price)
+            # The user's balance is being deducted along with the total booking amount.
 
             payment_data = PaymentCreate(
                 from_user_id=renter_id,
@@ -96,19 +100,31 @@ class BookingService:
                 total=total_price,
             )
             new_payment = await self.payment_session.create_payment(payment_data)
+            # If an error occurs in the previous balance deduction function,
+            # the payment creation function will not be called, and the transaction will be rolled back using `rollback()`.
 
             new_booking = await self.booking_session.create_booking(
                 renter_id, booking, new_payment.id
             )
+            # Finally, if the previous functions execute successfully,
+            # the booking will be created and the ID of the newly created payment will be passed to it.
 
             await self.session.flush()
             await self.session.commit()
             return new_booking
         except IntegrityError as e:
+            # If the database raises an integrity error inside the `try` block (foreign key, uniqueness, or our date constraint violation),
+            # this block is executed. `e` stores information about the error.
             await self.session.rollback()
             if getattr(e.orig, "sqlstate", None) == "23P01":
+                # `e.orig` is the original PostgreSQL driver error.
+                # It has a `sqlstate` code. `23P01` means "exclusion constraint violation",
+                # which indicates a violation of our date-overlap constraint.
+                # `getattr(..., None)` safely returns `None` if the attribute does not exist, preventing the code from crashing.
                 raise HTTPException(status_code=409, detail="Dates are already booked")
             raise
         except Exception:
+            # Any other error (e.g., insufficient funds or a bug in the code) must also roll back the transaction.
+            # It is then re-raised so that the upper level can handle it.
             await self.session.rollback()
             raise
