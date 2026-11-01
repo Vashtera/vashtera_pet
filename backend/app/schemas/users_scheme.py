@@ -36,7 +36,7 @@ class UserPublic(BaseModel):
 
 
 class UserTopUpBalance(BaseModel):
-    sum: float = Field(gt=0)
+    sum: Decimal = Field(gt=0)
 
 
 class Token(BaseModel):
