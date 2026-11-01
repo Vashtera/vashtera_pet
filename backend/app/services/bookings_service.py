@@ -17,6 +17,7 @@ from ..services.payments_service import PaymentService
 class BookingService:
     def __init__(self, db: AsyncSession):
         self.session = db
+        # This session is used exclusively to maintain a single session throughout the entire booking creation function.
         self.booking_session = BookingRepo(db)
         self.payment_session = PaymentRepo(db)
         self.premise_session = PremiseRepo(db)
