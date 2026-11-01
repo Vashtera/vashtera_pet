@@ -22,18 +22,27 @@ class BookingService:
         self.premise_session = PremiseRepo(db)
         self.user_session = UserRepo(db)
 
-    async def check_coflicts_service(self, booking: BookingCreate):
+    async def check_coflicts_service(self, booking: BookingCreate) -> None:
+        """
+        Function for checking conflicts and protecting against incorrect date input.
+
+        Args:
+            booking - Schema for creating a booking that contains the premise ID, check-in date, and check-out date.
+        """
         if booking.date_from == booking.date_to:
+            # Validation to prevent the check-out date from being equal to the check-in date and avoid database-level errors.
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="The check-in and check-out dates cannot be the same.",
             )
         if booking.date_from < date.today():
+            # Validation to prevent creating a booking for dates in the past.
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="You cannot enter a date from the past.",
             )
         conflicts = await self.booking_session.check_conflict(booking)
+        # A variable that calls the repository to check for conflicts at the database level and prevent date overlaps.
         if conflicts:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -41,14 +50,22 @@ class BookingService:
             )
 
     async def create_booking(self, renter_id: int, booking: BookingCreate):
+        """
+        Function for creating a booking for a registered user.
+
+        Args:
+            renter_id - ID of the registered user who creates the booking.
+            booking - Schema for creating a booking that contains the premise ID, check-in date, and check-out date.
+
+        Returns:
+            A new booking with an associated payment created for it and the booking marked as paid.
+
+        Exceptions:
+            HTTP_404 -
+        """
         await self.check_coflicts_service(booking)
 
         try:
-            user = await self.user_session.get_user_by_id(renter_id)
-            if user is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-                )
             landlord = await self.premise_session.get_premise_landlord(
                 booking.premise_id
             )
@@ -73,7 +90,7 @@ class BookingService:
             await self.payment_session.balance_deduction(renter_id, total_price)
 
             payment_data = PaymentCreate(
-                from_user_id=user.id,
+                from_user_id=renter_id,
                 to_landlord_id=landlord.id,
                 for_premise_id=premise.id,
                 total=total_price,
