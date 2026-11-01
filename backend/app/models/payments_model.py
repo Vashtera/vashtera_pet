@@ -17,16 +17,20 @@ class Payment(Base):
     from_user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False
     )
-    from_user: Mapped["User"] = relationship("User", foreign_keys="from_user_id")
+    from_user: Mapped["User"] = relationship(
+        "User", foreign_keys="Payment.from_user_id"
+    )
     to_landlord_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False
     )
-    to_landlord: Mapped["User"] = relationship("User", foreign_keys="from_user_id")
+    to_landlord: Mapped["User"] = relationship(
+        "User", foreign_keys="Payment.to_landlord_id"
+    )
     for_premise_id: Mapped[int] = mapped_column(
         ForeignKey("premises.id"), index=True, nullable=False
     )
     for_premise: Mapped["Premise"] = relationship(
-        "Premise", foreign_keys="from_user_id"
+        "Premise", foreign_keys="Payment.for_premise_id"
     )
     token: Mapped[str] = mapped_column(String(64), nullable=False)
     total: Mapped[Decimal] = mapped_column(

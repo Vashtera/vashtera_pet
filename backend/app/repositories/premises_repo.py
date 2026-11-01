@@ -172,15 +172,16 @@ class PremiseRepo:
             premise_id: int, the ID of the premise we want to retrieve
 
         Returns:
-            User model or `None`
+            User or `None`
         """
         stmt = (
-            select(User)
+            select(Premise)
             .where(Premise.id == premise_id)
             .options(selectinload(Premise.landlord))
         )
-        result = await self.session.execute(stmt)
-        return result.scalars().first()
+        premise = (await self.session.execute(stmt)).scalar_one_or_none()
+        landlord = premise.landlord if premise else None
+        return landlord
 
     async def get_premise_price_by_premise_id(self, premise_id: int) -> Decimal:
         stmt = (
