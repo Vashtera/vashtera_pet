@@ -33,7 +33,10 @@ class BookingRepo:
         return conflicts.scalar_one_or_none()
 
     async def create_booking(
-        self, renter_id: int, booking: BookingCreate
+        self,
+        new_renter_id: int,
+        booking: BookingCreate,
+        new_payment_id: int,
     ) -> Booking | None:
         """
         Creating a booking for an authenticated user
@@ -47,9 +50,10 @@ class BookingRepo:
         """
         db_booking = Booking(
             premise_id=booking.premise_id,
-            renter_id=renter_id,
+            renter_id=new_renter_id,
             # Substitution into the booking date range
             during=Range(booking.date_from, booking.date_to),
+            payment_id=new_payment_id,
         )
         self.session.add(db_booking)
         await self.session.flush()

@@ -23,7 +23,7 @@ class Booking(Base):
     payment_id: Mapped[int] = mapped_column(
         ForeignKey("payments.id"),
         index=True,
-        nullable=True,  # TODO TEMPORARY
+        nullable=False,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

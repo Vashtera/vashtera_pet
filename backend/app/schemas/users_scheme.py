@@ -23,6 +23,8 @@ class UserPrivate(UserBase):
     image_path: str
     balance: Decimal
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class UserPublic(BaseModel):
     id: int

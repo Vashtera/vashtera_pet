@@ -32,7 +32,6 @@ class Payment(Base):
     for_premise: Mapped["Premise"] = relationship(
         "Premise", foreign_keys="Payment.for_premise_id"
     )
-    token: Mapped[str] = mapped_column(String(64), nullable=False)
     total: Mapped[Decimal] = mapped_column(
         Numeric(12, 2),
         CheckConstraint("total >= 0", name="check_total"),

@@ -9,19 +9,21 @@ from ..schemas.users_scheme import UserPrivate, UserPublic
 
 class PaymentBase(BaseModel):
     id: int
-    from_user: UserPrivate
-    to_landlord: UserPublic
+    from_user: UserPublic
+    to_landlord: UserPrivate
     for_premise: PremiseResponse
     total: Decimal
-    created_at: datetime
 
 
 class PaymentCreate(BaseModel):
-    from_user: UserPrivate
-    to_landlord: UserPublic
-    for_premise: PremiseResponse
+    from_user_id: int
+    to_landlord_id: int
+    for_premise_id: int
     total: Decimal
-    created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
 
 
 class PaymentResponse(PaymentBase):

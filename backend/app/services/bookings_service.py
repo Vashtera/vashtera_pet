@@ -73,15 +73,16 @@ class BookingService:
             await self.payment_session.balance_deduction(renter_id, total_price)
 
             payment_data = PaymentCreate(
-                from_user=user,
-                to_landlord=landlord,
-                for_premise=premise,
+                from_user_id=user.id,
+                to_landlord_id=landlord.id,
+                for_premise_id=premise.id,
                 total=total_price,
-                created_at=datetime.now(),
             )
-            await self.payment_session.create_payment(payment_data)
+            new_payment = await self.payment_session.create_payment(payment_data)
 
-            new_booking = await self.booking_session.create_booking(renter_id, booking)
+            new_booking = await self.booking_session.create_booking(
+                renter_id, booking, new_payment.id
+            )
 
             await self.session.flush()
             await self.session.commit()
