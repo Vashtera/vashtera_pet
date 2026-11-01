@@ -61,7 +61,7 @@ class BookingService:
         Returns:
             A new booking with an associated payment created for it and the booking marked as paid.
 
-        Exceptions:
+        Raises:
             HTTP_404 - In case the landlord or the premises do not exist.
             HTTP_409 - Foreign key, uniqueness, or date constraint violation.
         """
