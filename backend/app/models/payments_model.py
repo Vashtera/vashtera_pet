@@ -12,7 +12,7 @@ class Payment(Base):
     __tablename__ = "payments"
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
-    # pending, received, rejected, frozen, paid
+    # "frozen", "released", "refunded"
     status: Mapped[str] = mapped_column(String, default="pending", nullable=False)
     from_user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False

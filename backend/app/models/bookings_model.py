@@ -18,7 +18,7 @@ class Booking(Base):
         ForeignKey("users.id"), index=True, nullable=False
     )
     during: Mapped[Range[datetime]] = mapped_column(DATERANGE, nullable=False)
-    # "pending", "approve", "reject"
+    # "confirmed", "completed", "cancelled"
     status: Mapped[str] = mapped_column(String(64), nullable=False, default="pending")
     payment_id: Mapped[int] = mapped_column(
         ForeignKey("payments.id"),
