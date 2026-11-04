@@ -13,7 +13,7 @@ class Payment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
     # "frozen", "released", "refunded"
-    status: Mapped[str] = mapped_column(String, default="pending", nullable=False)
+    status: Mapped[str] = mapped_column(String, default="frozen", nullable=False)
     from_user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False
     )
