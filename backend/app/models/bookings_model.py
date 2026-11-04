@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, String, and_
 from sqlalchemy.dialects.postgresql import DATERANGE, ExcludeConstraint, Range
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,4 +30,12 @@ class Booking(Base):
         default=lambda: datetime.now(UTC),
     )
 
-    __table_args__ = (ExcludeConstraint(("premise_id", "="), ("during", "&&")),)
+    __table_args__ = (
+        (
+            ExcludeConstraint(
+                ("premise_id", "="),
+                ("during", "&&"),
+                where=and_(status != "completed", status != "cancelled"),
+            ),
+        ),
+    )
