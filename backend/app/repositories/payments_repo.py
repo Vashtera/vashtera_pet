@@ -1,4 +1,5 @@
 from decimal import Decimal
+from enum import StrEnum
 
 from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import Range
@@ -8,6 +9,12 @@ from sqlalchemy.orm import selectinload
 from ..models.payments_model import Payment
 from ..models.users_model import User
 from ..schemas.payments_scheme import PaymentCreate
+
+
+class Status(StrEnum):
+    FROZEN = "frozen"
+    RELEASED = "released"
+    REFUNDED = "refunded"
 
 
 class PaymentRepo:
