@@ -31,11 +31,9 @@ class Booking(Base):
     )
 
     __table_args__ = (
-        (
-            ExcludeConstraint(
-                ("premise_id", "="),
-                ("during", "&&"),
-                where=and_(status != "completed", status != "cancelled"),
-            ),
+        ExcludeConstraint(
+            ("premise_id", "="),
+            ("during", "&&"),
+            where=and_(status != "completed", status != "cancelled"),
         ),
     )
