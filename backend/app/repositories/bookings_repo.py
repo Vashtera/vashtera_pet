@@ -23,7 +23,7 @@ class BookingRepo:
         """
         stmt = select(Booking).where(
             # Check for status
-            Booking.status != "confirmed",
+            Booking.status == "confirmed",
             # Check by premise_id
             Booking.premise_id == booking.premise_id,
             # Check for date overlap conflicts
