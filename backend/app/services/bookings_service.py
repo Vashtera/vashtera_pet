@@ -64,6 +64,7 @@ class BookingService:
         Raises:
             HTTP_404 - In case the landlord or the premises do not exist.
             HTTP_409 - Foreign key, uniqueness, or date constraint violation.
+            HTTP_403 - If user wants book his own premise
         """
         await self.check_coflicts_service(booking)
         # First, check for date conflicts and overlapping dates at the database level.
@@ -80,6 +81,11 @@ class BookingService:
             if premise is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Premise not found"
+                )
+            if premise.landlord_id == renter_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="You cannot book your own premise",
                 )
 
             premise_price = await self.premise_session.get_premise_price_by_premise_id(
