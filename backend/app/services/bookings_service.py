@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..repositories.bookings_repo import BookingRepo
+from ..repositories.bookings_repo import BookingRepo, Status
 from ..repositories.payments_repo import PaymentRepo
 from ..repositories.premises_repo import PremiseRepo
 from ..repositories.users_repo import UserRepo
@@ -86,6 +86,11 @@ class BookingService:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="You cannot book your own premise",
+                )
+            if premise.status == Status.CONFIRMED:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="You cannot book a space that has already been booked",
                 )
 
             premise_price = await self.premise_session.get_premise_price_by_premise_id(
