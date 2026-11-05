@@ -9,7 +9,7 @@ from ..models.bookings_model import Booking
 from ..schemas.bookings_scheme import BookingCreate
 
 
-class Status(StrEnum):
+class BookingStatus(StrEnum):
     CONFIRMED = "confirmed"
     COMPLETED = "completed"
     CANCELLED = "cancelled"

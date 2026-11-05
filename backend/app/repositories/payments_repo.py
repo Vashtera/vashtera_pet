@@ -11,7 +11,7 @@ from ..models.users_model import User
 from ..schemas.payments_scheme import PaymentCreate
 
 
-class Status(StrEnum):
+class PaymentStatus(StrEnum):
     FROZEN = "frozen"
     RELEASED = "released"
     REFUNDED = "refunded"
