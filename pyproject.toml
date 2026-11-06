@@ -19,6 +19,7 @@ dependencies = [
     "pytest>=9.1.1",
     "pytz>=2026.6",
     "sqlalchemy>=2.0.52",
+    "types-pytz>=2026.6.0.20261031",
 ]
 
 [project.scripts]
@@ -30,3 +31,7 @@ build-backend = "uv_build"
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header"]
+
+[[tool.mypy.overrides]]
+module = "apscheduler.*"
+ignore_missing_imports = true

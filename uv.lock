@@ -1328,6 +1328,15 @@ wheels = [
 ]
 
 [[package]]
+name = "types-pytz"
+version = "2026.6.0.20261031"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/67/41/d48d94925fa2e76b744628a9ac8c06002271b03181ee8e3f97bf804323f7/types_pytz-2026.6.0.20261031.tar.gz", hash = "sha256:8b559955f0c628f68159865c6f24835f4323c407a4408365b3676a074b524261", size = 11079, upload-time = "2026-10-31T07:39:13.265Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1c/0b/b28f2d9eb28c36b331f37cfe8c7b118fe26dfc96101b316155d7cf60bd90/types_pytz-2026.6.0.20261031-py3-none-any.whl", hash = "sha256:d0d4fbe482edfb263440421866cba41d25daba37e5584e0cff6712a3b5a9d9e9", size = 10165, upload-time = "2026-10-31T07:39:12.391Z" },
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1449,6 +1458,7 @@ dependencies = [
     { name = "pytest" },
     { name = "pytz" },
     { name = "sqlalchemy" },
+    { name = "types-pytz" },
 ]
 
 [package.metadata]
@@ -1464,6 +1474,7 @@ requires-dist = [
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytz", specifier = ">=2026.6" },
     { name = "sqlalchemy", specifier = ">=2.0.52" },
+    { name = "types-pytz", specifier = ">=2026.6.0.20261031" },
 ]
 
 [[package]]
