@@ -56,4 +56,4 @@ scheduler = AsyncIOScheduler(
 )
 
 # Run every day at 15:00 (Asia/Aqtobe), after the usual check-out time.
-scheduler.add_job(process_finished_bookings, "cron", hour=15, minute=0)
+scheduler.add_job(process_finished_bookings, "interval", minutes=1)
