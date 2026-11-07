@@ -78,3 +78,12 @@ class BookingRepo:
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def update_status_to_completed(self, booking_id: int):
+        stmt = (
+            update(Booking)
+            .where(Booking.id == booking_id)
+            .values(status=BookingStatus.COMPLETED)
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
