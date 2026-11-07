@@ -142,4 +142,5 @@ class BookingService:
             raise
 
 
-    async def process_finished_bookings(self, ):
+    async def process_finished_bookings(self):
+        

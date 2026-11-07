@@ -1,6 +1,7 @@
+from datetime import date
 from enum import StrEnum
 
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -69,3 +70,11 @@ class BookingRepo:
         await self.session.flush()
         await self.session.refresh(db_booking)
         return db_booking
+
+    async def get_finished_booking_ids(self, today: date) -> list[Booking]:
+        stmt = select(Booking).where(
+            Booking.status == BookingStatus.CONFIRMED,
+            func.upper(Booking.during) <= today,
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
