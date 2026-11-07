@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import HTTPException, status
 from repositories.bookings_repo import BookingRepo, BookingStatus
@@ -12,15 +13,17 @@ from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+COMMISSION_RATE = Decimal("0.05")
+
 
 class BookingService:
     def __init__(self, db: AsyncSession):
         self.session = db
         # This session is used exclusively to maintain a single session throughout the entire booking creation function.
-        self.booking_session = BookingRepo(db)
-        self.payment_session = PaymentRepo(db)
-        self.premise_session = PremiseRepo(db)
-        self.user_session = UserRepo(db)
+        self.booking_repo = BookingRepo(db)
+        self.payment_repo = PaymentRepo(db)
+        self.premise_repo = PremiseRepo(db)
+        self.user_repo = UserRepo(db)
 
     async def check_coflicts_service(self, booking: BookingCreate) -> None:
         """
@@ -41,7 +44,7 @@ class BookingService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="You cannot enter a date from the past.",
             )
-        conflicts = await self.booking_session.check_conflict(booking)
+        conflicts = await self.booking_repo.check_conflict(booking)
         # A variable that calls the repository to check for conflicts at the database level and prevent date overlaps.
         if conflicts:
             raise HTTPException(
@@ -69,14 +72,12 @@ class BookingService:
         # First, check for date conflicts and overlapping dates at the database level.
 
         try:
-            landlord = await self.premise_session.get_premise_landlord(
-                booking.premise_id
-            )
+            landlord = await self.premise_repo.get_premise_landlord(booking.premise_id)
             if landlord is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Landlord not found"
                 )
-            premise = await self.premise_session.get_premise_by_id(booking.premise_id)
+            premise = await self.premise_repo.get_premise_by_id(booking.premise_id)
             if premise is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Premise not found"
@@ -92,7 +93,7 @@ class BookingService:
                     detail="You cannot book a space that has already been booked",
                 )
 
-            premise_price = await self.premise_session.get_premise_price_by_premise_id(
+            premise_price = await self.premise_repo.get_premise_price_by_premise_id(
                 booking.premise_id
             )
 
@@ -101,7 +102,7 @@ class BookingService:
             )
             # This variable retrieves the total amount by calling a separate function that calculates the number of nights for the booking.
 
-            await self.payment_session.balance_deduction(renter_id, total_price)
+            await self.payment_repo.balance_deduction(renter_id, total_price)
             # The user's balance is being deducted along with the total booking amount.
 
             payment_data = PaymentCreate(
@@ -110,11 +111,11 @@ class BookingService:
                 for_premise_id=premise.id,
                 total=total_price,
             )
-            new_payment = await self.payment_session.create_payment(payment_data)
+            new_payment = await self.payment_repo.create_payment(payment_data)
             # If an error occurs in the previous balance deduction function,
             # the payment creation function will not be called, and the transaction will be rolled back using `rollback()`.
 
-            new_booking = await self.booking_session.create_booking(
+            new_booking = await self.booking_repo.create_booking(
                 renter_id, booking, new_payment.id
             )
             # Finally, if the previous functions execute successfully,
@@ -141,23 +142,49 @@ class BookingService:
             raise
 
     async def complete_booking_and_payment(self, booking_id: int) -> None:
-        """
-        Service for updating the booking and payment statuses.
+        """Complete a finished booking and pay out the landlord.
+
+        In one transaction: marks the booking as ``completed``, releases the
+        frozen payment, and credits the landlord's balance with the payment total
+        minus the platform commission. Everything is committed once at the end; on
+        any error the whole transaction is rolled back.
 
         Args:
-            booking_id(int) - Booking ID used to retrieve the booking model and as an argument for updating the booking status.
+            booking_id (int): ID of the booking to complete.
 
         Raises:
-            HTTP_404 - If booking deosn't exist
+            HTTPException: 404 if the booking does not exist.
+            HTTPException: 404 if the payment does not exist or was already released.
         """
-        booking = await self.booking_session.get_booking_by_id(booking_id)
+        booking = await self.booking_repo.get_booking_by_id(booking_id)
         if booking is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist"
             )
+        try:
+            await self.booking_repo.update_status_to_completed(booking_id)
+            # Changing the booking status
 
-        await self.booking_session.update_status_to_completed(booking_id)
-        # Changing the booking status
+            payment = await self.payment_repo.update_status_to_released(
+                booking.payment_id
+            )
+            if payment is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Payment doesn't exist",
+                )
+            # Only after the booking status has been successfully changed do we call the function to update the payment status.
 
-        await self.payment_session.update_status_to_released(booking.payment_id)
-        # Only after the booking status has been successfully changed do we call the function to update the payment status.
+            commission = (payment[0] * COMMISSION_RATE).quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP,
+                # This is a rounding rule. "Half up" is the standard method taught in school:
+                # if the next digit is 5 or greater, round up. Otherwise, round down.
+            )
+            user_id = payment[1]
+            payout = payment[0] - commission
+            await self.user_repo.credit_balance_to_landlord(user_id, payout)
+            await self.session.commit()
+        except Exception:
+            await self.session.rollback()
+            raise

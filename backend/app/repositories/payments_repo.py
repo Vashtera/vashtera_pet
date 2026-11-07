@@ -1,5 +1,6 @@
 from decimal import Decimal
 from enum import StrEnum
+from typing import Any
 
 from models.payments_model import Payment
 from models.users_model import User
@@ -66,11 +67,27 @@ class PaymentRepo:
         await self.session.flush()
         return new_payment
 
-    async def update_status_to_released(self, payment_id: int):
+    async def update_status_to_released(
+        self, payment_id: int
+    ) -> tuple[Decimal, int] | None:
+        """Move a payment from ``frozen`` to ``released``.
+
+        The update is conditional (the payment must currently be ``frozen``), so
+        repeated calls cannot release the same payment twice. Does not commit.
+
+        Args:
+            payment_id (int): ID of the payment to release.
+
+        Returns:
+            tuple[Decimal, int] | None: ``(total, to_landlord_id)`` of the released
+            payment, or ``None`` if the payment does not exist or is not ``frozen``.
+        """
         stmt = (
             update(Payment)
-            .where(Payment.id == payment_id)
+            .where(Payment.id == payment_id, Payment.status == PaymentStatus.FROZEN)
             .values(status=PaymentStatus.RELEASED)
+            .returning(Payment.total, Payment.to_landlord_id)
         )
-        await self.session.execute(stmt)
+        result = await self.session.execute(stmt)
         await self.session.flush()
+        return result.one_or_none()

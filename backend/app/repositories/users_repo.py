@@ -96,3 +96,19 @@ class UserRepo:
         )
         await self.session.execute(stmt)
         await self.session.commit()
+
+    async def credit_balance_to_landlord(self, user_id: int, amount: Decimal) -> None:
+        """Add an amount to a user's balance.
+
+        The addition is done inside the database (``balance = balance + amount``),
+        so concurrent credits cannot overwrite each other. Does not commit.
+
+        Args:
+            user_id (int): ID of the user whose balance is increased.
+            amount (Decimal): Amount to add (must be positive).
+        """
+        stmt = (
+            update(User).where(User.id == user_id).values(balance=User.balance + amount)
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
