@@ -140,3 +140,6 @@ class BookingService:
             # It is then re-raised so that the upper level can handle it.
             await self.session.rollback()
             raise
+
+
+    async def process_finished_bookings(self, ):

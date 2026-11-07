@@ -6,12 +6,15 @@ from .database import engine
 from .routers.bookings import router as bookings_router
 from .routers.premises import router as premise_router
 from .routers.users import router as users_router
+from .services.scheduler_service import scheduler
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    scheduler.start()  # starting the task scheduler
     yield  # engine initialised at module level
     await engine.dispose()  # drain pool on shutdown
+    scheduler.shutdown()  # stopping the task scheduler
 
 
 app = FastAPI()
