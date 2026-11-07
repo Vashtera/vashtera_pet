@@ -1,3 +1,6 @@
+import logging
+
+logging.basicConfig(level=logging.INFO)
 from contextlib import asynccontextmanager
 
 from database import engine
@@ -18,7 +21,7 @@ async def lifespan(_app: FastAPI):
         await engine.dispose()  # then drain the connection pool
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(premise_router, prefix="/api/premises", tags=["premises"])
 app.include_router(users_router, prefix="/api/users", tags=["users"])

@@ -38,9 +38,8 @@ async def process_finished_bookings() -> None:
         async with AsyncSessionFactory() as session:
             service = BookingService(session)
             try:
-                await service.complete_booking_and_payment(
-                    booking_id
-                )  # commits internally
+                await service.complete_booking_and_payment(booking_id)
+                await session.commit()
             except Exception:
                 await session.rollback()
                 logger.exception("Failed to complete booking %s", booking_id)
