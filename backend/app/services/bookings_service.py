@@ -141,7 +141,24 @@ class BookingService:
             await self.session.rollback()
             raise
 
+    async def complete_booking_and_payment(self, booking_id: int) -> None:
+        """
+        Service for updating the booking and payment statuses.
 
-    async def process_finished_bookings(self, booking_id: int):
-        
-        
+        Args:
+            booking_id(int) - Booking ID used to retrieve the booking model and as an argument for updating the booking status.
+
+        Raises:
+            HTTP_404 - If booking deosn't exist
+        """
+        booking = await self.booking_session.get_booking_by_id(booking_id)
+        if booking is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist"
+            )
+
+        await self.booking_session.update_status_to_completed(booking_id)
+        # Changing the booking status
+
+        await self.payment_session.update_status_to_released(booking.payment_id)
+        # Only after the booking status has been successfully changed do we call the function to update the payment status.

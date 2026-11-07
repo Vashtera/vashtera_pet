@@ -20,6 +20,11 @@ class BookingRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    async def get_booking_by_id(self, booking_id: int) -> Booking | None:
+        stmt = select(Booking).where(Booking.id == booking_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def check_conflict(self, booking: BookingCreate) -> Booking | None:
         """
         Checking for date overlap conflicts by premise_id
