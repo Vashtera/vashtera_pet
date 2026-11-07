@@ -76,8 +76,8 @@ class BookingRepo:
         await self.session.refresh(db_booking)
         return db_booking
 
-    async def get_finished_booking_ids(self, today: date) -> list[Booking]:
-        stmt = select(Booking).where(
+    async def get_finished_booking_ids(self, today: date) -> list[int]:
+        stmt = select(Booking.id).where(
             Booking.status == BookingStatus.CONFIRMED,
             func.upper(Booking.during) <= today,
         )

@@ -12,9 +12,11 @@ from .services.scheduler_service import scheduler
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     scheduler.start()  # starting the task scheduler
-    yield  # engine initialised at module level
-    await engine.dispose()  # drain pool on shutdown
-    scheduler.shutdown()  # stopping the task scheduler
+    try:
+        yield
+    finally:
+        scheduler.shutdown()  # stop the scheduler first, so no job runs while closing the pool
+        await engine.dispose()  # then drain the connection pool
 
 
 app = FastAPI()
