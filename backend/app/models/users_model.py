@@ -1,11 +1,10 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from core.config import settings
+from database import Base
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from ..core.config import settings
-from ..database import Base
 
 
 class User(Base):

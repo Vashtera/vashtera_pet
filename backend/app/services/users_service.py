@@ -1,12 +1,11 @@
 from typing import Annotated
 
+from core.security import verify_password
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from repositories.users_repo import UserRepo
+from schemas.users_scheme import UserCreate, UserTopUpBalance
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from ..core.security import verify_password
-from ..repositories.users_repo import UserRepo
-from ..schemas.users_scheme import UserCreate, UserTopUpBalance
 
 
 class UserService:

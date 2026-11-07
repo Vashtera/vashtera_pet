@@ -2,9 +2,8 @@ from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
-
-from ..schemas.premises_scheme import ShortPremiseResponse
-from ..schemas.users_scheme import UserPublic
+from schemas.premises_scheme import ShortPremiseResponse
+from schemas.users_scheme import UserPublic
 
 
 class ORMBase(BaseModel):

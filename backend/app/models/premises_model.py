@@ -1,10 +1,9 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from database import Base
 from sqlalchemy import DECIMAL, TEXT, DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from ..database import Base
 
 
 class Premise(Base):

@@ -1,13 +1,12 @@
 from fastapi import HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from ..repositories.premises_repo import PremiseRepo
-from ..schemas.premises_scheme import (
+from repositories.premises_repo import PremiseRepo
+from schemas.premises_scheme import (
     AddressCreate,
     FeatureCreate,
     PremiseCreate,
     PremiseUpdate,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class PremiseService:

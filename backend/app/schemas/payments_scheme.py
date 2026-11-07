@@ -1,9 +1,8 @@
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
-
-from ..schemas.premises_scheme import PremiseResponse
-from ..schemas.users_scheme import UserPrivate, UserPublic
+from schemas.premises_scheme import PremiseResponse
+from schemas.users_scheme import UserPrivate, UserPublic
 
 
 class PaymentBase(BaseModel):

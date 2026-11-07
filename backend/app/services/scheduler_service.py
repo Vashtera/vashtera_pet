@@ -3,10 +3,9 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-from ..database import AsyncSessionFactory
-from ..repositories.bookings_repo import BookingRepo
-from ..services.bookings_service import BookingService
+from database import AsyncSessionFactory
+from repositories.bookings_repo import BookingRepo
+from services.bookings_service import BookingService
 
 logger = logging.getLogger(__name__)
 

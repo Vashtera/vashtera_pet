@@ -1,14 +1,13 @@
 from datetime import timedelta
 from typing import Annotated
 
+from auth import CurrentUser, create_access_token
+from core.config import settings
+from database import get_db
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
-
-from ..auth import CurrentUser, create_access_token
-from ..core.config import settings
-from ..database import get_db
-from ..schemas.users_scheme import Token, UserCreate, UserPrivate, UserTopUpBalance
-from ..services.users_service import UserService
+from schemas.users_scheme import Token, UserCreate, UserPrivate, UserTopUpBalance
+from services.users_service import UserService
 
 router = APIRouter()
 

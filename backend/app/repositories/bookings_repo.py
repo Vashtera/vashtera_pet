@@ -1,13 +1,12 @@
 from datetime import date
 from enum import StrEnum
 
+from models.bookings_model import Booking
+from schemas.bookings_scheme import BookingCreate
 from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-
-from ..models.bookings_model import Booking
-from ..schemas.bookings_scheme import BookingCreate
 
 
 class BookingStatus(StrEnum):

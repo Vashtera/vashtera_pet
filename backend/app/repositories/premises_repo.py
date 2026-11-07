@@ -1,17 +1,16 @@
 from decimal import Decimal
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
-from ..models.premises_model import Premise, PremiseAddress, PremiseFeature
-from ..models.users_model import User
-from ..schemas.premises_scheme import (
+from models.premises_model import Premise, PremiseAddress, PremiseFeature
+from models.users_model import User
+from schemas.premises_scheme import (
     AddressCreate,
     FeatureCreate,
     PremiseCreate,
     PremiseUpdate,
 )
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 
 class PremiseRepo:

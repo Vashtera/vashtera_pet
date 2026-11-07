@@ -1,11 +1,10 @@
 from decimal import Decimal
 
+from core.security import hash_password
+from models.users_model import User
+from schemas.users_scheme import UserCreate, UserTopUpBalance
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from ..core.security import hash_password
-from ..models.users_model import User
-from ..schemas.users_scheme import UserCreate, UserTopUpBalance
 
 
 class UserRepo:

@@ -1,10 +1,9 @@
 from decimal import Decimal
 
 from fastapi import HTTPException, status
+from repositories.payments_repo import PaymentRepo
 from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from ..repositories.payments_repo import PaymentRepo
 
 
 class PaymentService:

@@ -1,8 +1,7 @@
+from auth import CurrentUser
+from database import get_db
 from fastapi import APIRouter, Depends, status
-
-from ..auth import CurrentUser
-from ..database import get_db
-from ..schemas.premises_scheme import (
+from schemas.premises_scheme import (
     AddressCreate,
     FeatureCreate,
     PremiseCreate,
@@ -10,7 +9,7 @@ from ..schemas.premises_scheme import (
     PremiseUpdate,
     ShortPremiseResponse,
 )
-from ..services.premises_service import PremiseService
+from services.premises_service import PremiseService
 
 router = APIRouter()
 

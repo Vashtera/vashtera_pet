@@ -1,12 +1,11 @@
 from contextlib import asynccontextmanager
 
+from database import engine
 from fastapi import FastAPI
-
-from .database import engine
-from .routers.bookings import router as bookings_router
-from .routers.premises import router as premise_router
-from .routers.users import router as users_router
-from .services.scheduler_service import scheduler
+from routers.bookings import router as bookings_router
+from routers.premises import router as premise_router
+from routers.users import router as users_router
+from services.scheduler_service import scheduler
 
 
 @asynccontextmanager
