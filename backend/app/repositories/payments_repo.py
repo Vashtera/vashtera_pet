@@ -66,3 +66,12 @@ class PaymentRepo:
         self.session.add(new_payment)
         await self.session.flush()
         return new_payment
+
+    async def update_status_to_released(self, payment_id: int):
+        stmt = (
+            update(Payment)
+            .where(Payment.id == payment_id)
+            .values(status=PaymentStatus.RELEASED)
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
