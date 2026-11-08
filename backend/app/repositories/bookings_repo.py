@@ -85,6 +85,18 @@ class BookingRepo:
         return db_booking
 
     async def get_finished_booking_ids(self, today: date) -> list[int]:
+        """Return IDs of confirmed bookings whose stay is already over.
+
+        A booking is finished when its check-out date (the exclusive upper
+        bound of ``during``) is on or before ``today``.
+
+        Args:
+            today: Current date used as the cutoff.
+
+        Returns:
+            IDs of bookings with status ``confirmed`` that are ready to be
+            completed and paid out.
+        """
         stmt = select(Booking.id).where(
             Booking.status == BookingStatus.CONFIRMED,
             func.upper(Booking.during) <= today,
@@ -93,6 +105,13 @@ class BookingRepo:
         return result.scalars().all()
 
     async def update_status_to_completed(self, booking_id: int) -> None:
+        """Set the booking status to ``completed``.
+
+        Flushes the change but does not commit; the caller owns the transaction.
+
+        Args:
+            booking_id: ID of the booking to update.
+        """
         stmt = (
             update(Booking)
             .where(Booking.id == booking_id)
@@ -102,6 +121,14 @@ class BookingRepo:
         await self.session.flush()
 
     async def update_status_to_cancelled(self, booking_id: int) -> None:
+        """Set the booking status to ``cancelled``.
+
+        Flushes the change but does not commit; the caller owns the transaction.
+        A cancelled booking no longer blocks its dates.
+
+        Args:
+            booking_id: ID of the booking to update.
+        """
         stmt = (
             update(Booking)
             .where(Booking.id == booking_id)
@@ -111,6 +138,15 @@ class BookingRepo:
         await self.session.flush()
 
     async def get_arrival_date_by_id(self, booking_id: int) -> date | None:
+        """Return the check-in date of a confirmed booking.
+
+        Args:
+            booking_id: ID of the booking.
+
+        Returns:
+            The lower bound of ``during``, or None if the booking does not
+            exist or is not in ``confirmed`` status.
+        """
         stmt = select(func.lower(Booking.during)).where(
             Booking.id == booking_id, Booking.status == BookingStatus.CONFIRMED
         )

@@ -46,4 +46,10 @@ async def cancel_booking(
     renter: CurrentUser,
     db: BookingService = Depends(get_booking_service),
 ):
+    """Cancel the current user's booking.
+
+    Refunds the renter if the arrival date has not come yet; otherwise
+    pays the landlord minus commission. See
+    ``BookingService.cancel_booking_and_payment`` for the full rules.
+    """
     return await db.cancel_booking_and_payment(booking_id, renter.id)

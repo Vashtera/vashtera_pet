@@ -93,6 +93,19 @@ class PaymentRepo:
         return result.one_or_none()
 
     async def update_status_to_refunded(self, payment_id: int) -> Decimal | None:
+        """Atomically move a payment from ``frozen`` to ``refunded``.
+
+        The conditional UPDATE makes the operation idempotent: a payment that
+        was already refunded or released is not touched, so money can never be
+        returned twice. Flushes but does not commit.
+
+        Args:
+            payment_id: ID of the payment to refund.
+
+        Returns:
+            The payment total to return to the renter, or None if the payment
+            was not found or was not in the expected status.
+        """
         stmt = (
             update(Payment)
             .where(Payment.id == payment_id, Payment.status == PaymentStatus.FROZEN)

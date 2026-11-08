@@ -185,6 +185,28 @@ class BookingService:
             raise
 
     async def cancel_booking_and_payment(self, booking_id: int, renter_id: int) -> None:
+        """Cancel a confirmed booking and settle its frozen payment.
+
+        The booking is always cancelled, so its dates become available again.
+        The money depends on the current date (Kazakhstan time):
+
+        * Before the arrival date: the payment is refunded to the renter.
+        * On or after the arrival date: no refund. The payment is released to
+          the landlord minus the platform commission.
+
+        All changes happen in a single transaction: the booking status, the
+        payment status and the balance update are committed together, or
+        rolled back together on any error.
+
+        Args:
+            booking_id: ID of the booking to cancel.
+            renter_id: ID of the user who requests the cancellation. Must be
+                the renter who made the booking.
+
+        Raises:
+            HTTPException: 404 if the booking does not exist or belongs to
+                another user, or if its payment is not in the expected state.
+        """
         booking = await self.booking_repo.get_booking_with_renter_by_id(
             booking_id, renter_id
         )

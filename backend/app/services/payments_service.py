@@ -44,6 +44,17 @@ class PaymentService:
     def commission_calculation(
         amount: Decimal,
     ) -> Decimal:
+        """Calculate the platform commission for a payment amount.
+
+        The commission is ``amount * COMMISSION_RATE``, rounded to cents using
+        ROUND_HALF_UP.
+
+        Args:
+            amount: Total payment amount.
+
+        Returns:
+            The commission, quantized to two decimal places.
+        """
         commission = (amount * COMMISSION_RATE).quantize(
             Decimal("0.01"),
             rounding=ROUND_HALF_UP,
