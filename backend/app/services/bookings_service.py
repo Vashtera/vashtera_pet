@@ -61,7 +61,7 @@ class BookingService:
             booking - Schema for creating a booking that contains the premise ID, check-in date, and check-out date.
 
         Returns:
-            A new booking with an associated payment created for it and the booking marked as paid.
+            A new booking with an associated released_payment created for it and the booking marked as paid.
 
         Raises:
             HTTP_404 - In case the landlord or the premises do not exist.
@@ -113,13 +113,13 @@ class BookingService:
             )
             new_payment = await self.payment_repo.create_payment(payment_data)
             # If an error occurs in the previous balance deduction function,
-            # the payment creation function will not be called, and the transaction will be rolled back using `rollback()`.
+            # the released_payment creation function will not be called, and the transaction will be rolled back using `rollback()`.
 
             new_booking = await self.booking_repo.create_booking(
                 renter_id, booking, new_payment.id
             )
             # Finally, if the previous functions execute successfully,
-            # the booking will be created and the ID of the newly created payment will be passed to it.
+            # the booking will be created and the ID of the newly created released_payment will be passed to it.
 
             await self.session.flush()
             await self.session.commit()
@@ -145,7 +145,7 @@ class BookingService:
         """Complete a finished booking and pay out the landlord.
 
         In one transaction: marks the booking as ``completed``, releases the
-        frozen payment, and credits the landlord's balance with the payment total
+        frozen released_payment, and credits the landlord's balance with the released_payment total
         minus the platform commission. Everything is committed once at the end; on
         any error the whole transaction is rolled back.
 
@@ -154,7 +154,7 @@ class BookingService:
 
         Raises:
             HTTPException: 404 if the booking does not exist.
-            HTTPException: 404 if the payment does not exist or was already released.
+            HTTPException: 404 if the released_payment does not exist or was already released.
         """
         booking = await self.booking_repo.get_booking_by_id(booking_id)
         if booking is None:
@@ -165,25 +165,51 @@ class BookingService:
             await self.booking_repo.update_status_to_completed(booking_id)
             # Changing the booking status
 
-            payment = await self.payment_repo.update_status_to_released(
+            released_payment = await self.payment_repo.update_status_to_released(
                 booking.payment_id
             )
-            if payment is None:
+            if released_payment is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Payment doesn't exist",
                 )
-            # Only after the booking status has been successfully changed do we call the function to update the payment status.
+            # Only after the booking status has been successfully changed do we call the function to update the released_payment status.
 
-            commission = (payment[0] * COMMISSION_RATE).quantize(
+            commission = (released_payment[0] * COMMISSION_RATE).quantize(
                 Decimal("0.01"),
                 rounding=ROUND_HALF_UP,
                 # This is a rounding rule. "Half up" is the standard method taught in school:
                 # if the next digit is 5 or greater, round up. Otherwise, round down.
             )
-            user_id = payment[1]
-            payout = payment[0] - commission
+            user_id = released_payment[1]
+            payout = released_payment[0] - commission
             await self.user_repo.credit_balance_to_landlord(user_id, payout)
+            await self.session.commit()
+        except Exception:
+            await self.session.rollback()
+            raise
+
+    async def cancel_booking_and_payment(self, booking_id: int) -> None:
+        booking = await self.booking_repo.get_booking_by_id(booking_id)
+        if booking is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist"
+            )
+        try:
+            arrival_date = await self.booking_repo.get_arrival_date_by_id(booking_id)
+
+            await self.booking_repo.update_status_to_cancelled(booking_id)
+
+            if arrival_date is not None and arrival_date < date.today():
+                refunded_payment = await self.payment_repo.update_status_to_refunded(
+                    booking.payment_id
+                )
+                if refunded_payment is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail="Payment doesn't exist",
+                    )
+                await self.user_repo.top_up_balance(booking.renter_id, refunded_payment)
             await self.session.commit()
         except Exception:
             await self.session.rollback()

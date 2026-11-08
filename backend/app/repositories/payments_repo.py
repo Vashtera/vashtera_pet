@@ -92,11 +92,13 @@ class PaymentRepo:
         await self.session.flush()
         return result.one_or_none()
 
-    async def update_status_to_refunded(self, payment_id: int):
+    async def update_status_to_refunded(self, payment_id: int) -> Decimal | None:
         stmt = (
             update(Payment)
             .where(Payment.id == payment_id, Payment.status == PaymentStatus.RELEASED)
             .values(status=PaymentStatus.REFUNDED)
+            .returning(Payment.total)
         )
-        await self.session.execute(stmt)
+        result = await self.session.execute(stmt)
         await self.session.flush()
+        return result.scalar_one_or_none()

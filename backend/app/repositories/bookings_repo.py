@@ -83,7 +83,7 @@ class BookingRepo:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def update_status_to_completed(self, booking_id: int):
+    async def update_status_to_completed(self, booking_id: int) -> None:
         stmt = (
             update(Booking)
             .where(Booking.id == booking_id)
@@ -92,7 +92,7 @@ class BookingRepo:
         await self.session.execute(stmt)
         await self.session.flush()
 
-    async def update_status_to_cancelled(self, booking_id: int):
+    async def update_status_to_cancelled(self, booking_id: int) -> None:
         stmt = (
             update(Booking)
             .where(Booking.id == booking_id)
@@ -100,3 +100,10 @@ class BookingRepo:
         )
         await self.session.execute(stmt)
         await self.session.flush()
+
+    async def get_arrival_date_by_id(self, booking_id: int) -> date | None:
+        stmt = select(func.lower(Booking.during)).where(
+            Booking.id == booking_id, Booking.status == BookingStatus.CONFIRMED
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
