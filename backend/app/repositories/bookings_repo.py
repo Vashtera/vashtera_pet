@@ -91,3 +91,12 @@ class BookingRepo:
         )
         await self.session.execute(stmt)
         await self.session.flush()
+
+    async def update_status_to_cancelled(self, booking_id: int):
+        stmt = (
+            update(Booking)
+            .where(Booking.id == booking_id)
+            .values(status=BookingStatus.CANCELLED)
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
