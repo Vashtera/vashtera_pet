@@ -95,7 +95,7 @@ class PaymentRepo:
     async def update_status_to_refunded(self, payment_id: int) -> Decimal | None:
         stmt = (
             update(Payment)
-            .where(Payment.id == payment_id, Payment.status == PaymentStatus.RELEASED)
+            .where(Payment.id == payment_id, Payment.status == PaymentStatus.FROZEN)
             .values(status=PaymentStatus.REFUNDED)
             .returning(Payment.total)
         )

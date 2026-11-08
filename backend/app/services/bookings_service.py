@@ -197,7 +197,7 @@ class BookingService:
 
             await self.booking_repo.update_status_to_cancelled(booking_id)
 
-            if arrival_date is not None and arrival_date < date.today():
+            if arrival_date is not None and date.today() < arrival_date:
                 refunded_payment = await self.payment_repo.update_status_to_refunded(
                     booking.payment_id
                 )
