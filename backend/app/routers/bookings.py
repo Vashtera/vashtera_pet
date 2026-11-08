@@ -38,3 +38,12 @@ async def create_booking(
         The newly created booking (HTTP 201).
     """
     return await db.create_booking(renter.id, booking)
+
+
+@router.post("/{booking_id}/cancel", status_code=status.HTTP_200_OK)
+async def cancel_booking(
+    booking_id: int,
+    renter: CurrentUser,
+    db: BookingService = Depends(get_booking_service),
+):
+    return await db.cancel_booking_and_payment(booking_id, renter.id)

@@ -1,7 +1,8 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import HTTPException, status
 from repositories.payments_repo import PaymentRepo
+from services.bookings_service import COMMISSION_RATE
 from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,3 +39,15 @@ class PaymentService:
             )
         nights = (date_to - date_from).days
         return premise_price * nights
+
+    @staticmethod
+    def commission_calculation(
+        amount: Decimal,
+    ) -> Decimal:
+        commission = (amount * COMMISSION_RATE).quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+            # This is a rounding rule. "Half up" is the standard method taught in school:
+            # if the next digit is 5 or greater, round up. Otherwise, round down.
+        )
+        return commission

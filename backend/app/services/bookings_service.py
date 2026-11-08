@@ -175,12 +175,7 @@ class BookingService:
                 )
             # Only after the booking status has been successfully changed do we call the function to update the released_payment status.
 
-            commission = (released_payment[0] * COMMISSION_RATE).quantize(
-                Decimal("0.01"),
-                rounding=ROUND_HALF_UP,
-                # This is a rounding rule. "Half up" is the standard method taught in school:
-                # if the next digit is 5 or greater, round up. Otherwise, round down.
-            )
+            commission = PaymentService.commission_calculation(released_payment[0])
             user_id = released_payment[1]
             payout = released_payment[0] - commission
             await self.user_repo.credit_balance_to_landlord(user_id, payout)
@@ -189,8 +184,10 @@ class BookingService:
             await self.session.rollback()
             raise
 
-    async def cancel_booking_and_payment(self, booking_id: int) -> None:
-        booking = await self.booking_repo.get_booking_by_id(booking_id)
+    async def cancel_booking_and_payment(self, booking_id: int, renter_id: int) -> None:
+        booking = await self.booking_repo.get_booking_with_renter_by_id(
+            booking_id, renter_id
+        )
         if booking is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist"
@@ -210,6 +207,20 @@ class BookingService:
                         detail="Payment doesn't exist",
                     )
                 await self.user_repo.top_up_balance(booking.renter_id, refunded_payment)
+            else:
+                released_payment = await self.payment_repo.update_status_to_released(
+                    booking.payment_id
+                )
+                if released_payment is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail="Payment doesn't exist",
+                    )
+
+                commission = PaymentService.commission_calculation(released_payment[0])
+                user_id = released_payment[1]
+                payout = released_payment[0] - commission
+                await self.user_repo.credit_balance_to_landlord(user_id, payout)
             await self.session.commit()
         except Exception:
             await self.session.rollback()
