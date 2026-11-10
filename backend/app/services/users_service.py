@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 
 from core.security import verify_password
@@ -6,6 +7,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from repositories.users_repo import UserRepo
 from schemas.users_scheme import UserCreate, UserTopUpBalance
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 
 class UserService:

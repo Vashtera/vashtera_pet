@@ -3,6 +3,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 from contextlib import asynccontextmanager
 
+from app.core.logging import setup_logging
 from database import engine
 from fastapi import FastAPI
 from routers.bookings import router as bookings_router
@@ -13,6 +14,7 @@ from services.scheduler_service import scheduler
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    setup_logging()
     scheduler.start()  # starting the task scheduler
     try:
         yield

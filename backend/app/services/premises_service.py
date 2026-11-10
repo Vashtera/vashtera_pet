@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import HTTPException, status
 from repositories.premises_repo import PremiseRepo
 from schemas.premises_scheme import (
@@ -7,6 +9,8 @@ from schemas.premises_scheme import (
     PremiseUpdate,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 
 class PremiseService:
