@@ -1,5 +1,6 @@
+import logging
 from datetime import date
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 
 from fastapi import HTTPException, status
 from repositories.bookings_repo import BookingRepo, BookingStatus
@@ -188,7 +189,7 @@ class BookingService:
         """Cancel a confirmed booking and settle its frozen payment.
 
         The booking is always cancelled, so its dates become available again.
-        The money depends on the current date (Kazakhstan time):
+        The money depends on the current date:
 
         * Before the arrival date: the payment is refunded to the renter.
         * On or after the arrival date: no refund. The payment is released to
