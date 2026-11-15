@@ -277,19 +277,35 @@ class BookingService:
             booking_id, renter_id
         )
         if booking is None:
+            logger.warning(
+                "Complete booking rejected: bookingnot found, booking_id=%s", booking_id
+            )
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist"
             )
         try:
             arrival_date = await self.booking_repo.get_arrival_date_by_id(booking_id)
+            if arrival_date is None:
+                logger.error(
+                    "Cancel booking rejected: booking not found, booking_id=%s",
+                    booking_id,
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Booking doesn't exist",
+                )
 
             await self.booking_repo.update_status_to_cancelled(booking_id)
 
-            if arrival_date is not None and date.today() < arrival_date:
+            if date.today() < arrival_date:
                 refunded_payment = await self.payment_repo.update_status_to_refunded(
                     booking.payment_id
                 )
                 if refunded_payment is None:
+                    logger.warning(
+                        "Update payment status to refunded rejected: payment not found, booking_id=%s",
+                        booking_id,
+                    )
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Payment doesn't exist",
@@ -300,6 +316,10 @@ class BookingService:
                     booking.payment_id
                 )
                 if released_payment is None:
+                    logger.warning(
+                        "Update payment status to released rejected: payment not found, booking_id=%s",
+                        booking_id,
+                    )
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Payment doesn't exist",
@@ -311,5 +331,8 @@ class BookingService:
                 await self.user_repo.credit_balance_to_landlord(user_id, payout)
             await self.session.commit()
         except Exception:
+            logger.exception(
+                "Unexpected error while cancel statuses, booking_id=%s", booking_id
+            )
             await self.session.rollback()
             raise
