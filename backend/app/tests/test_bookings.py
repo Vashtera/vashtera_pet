@@ -29,7 +29,7 @@ PREMISE_JSON = {
 
 
 @dataclass
-class Ctx:
+class Ctx:  # context
     landlord_id: int
     renter_id: int
     premise_id: int
@@ -110,15 +110,13 @@ async def test_create_double_bookings(concurrent_client: AsyncClient, db_session
     landlord = await _register_and_login(
         concurrent_client, "landlord", "landlord@mail.com", "87770001122"
     )
-    renter_1 = await _register_and_login(
-        concurrent_client, "renter1", "renter1@mail.com", "87770001133"
-    )
-    renter_2 = await _register_and_login(
-        concurrent_client, "renter2", "renter2@mail.com", "87770001144"
-    )
-
-    # Users get ids 1, 2, 3 in registration order (the DB is reset between tests).
-    for user_id, headers in ((2, renter_1), (3, renter_2)):
+    renters = []
+    for i in range(5):
+        headers = await _register_and_login(
+            concurrent_client, f"renter{i}", f"renter{i}@mail.com", f"877700011{i}0"
+        )
+        renters.append(headers)
+        user_id = i + 2  # the landlord is id 1
         top_up = await concurrent_client.post(
             f"/api/users/{user_id}/top-up", json={"sum": 50000}, headers=headers
         )
@@ -159,12 +157,14 @@ async def test_create_double_bookings(concurrent_client: AsyncClient, db_session
     }
 
     responses = await asyncio.gather(
-        concurrent_client.post("/api/bookings", json=payload, headers=renter_1),
-        concurrent_client.post("/api/bookings", json=payload, headers=renter_2),
+        *[
+            concurrent_client.post("/api/bookings", json=payload, headers=h)
+            for h in renters
+        ]
     )
 
     statuses = sorted(r.status_code for r in responses)
-    assert statuses == [201, 409], [r.text for r in responses]
+    assert statuses == [201, 409, 409, 409, 409], [r.text for r in responses]
 
     # Rollback check: the loser's request failed after the deduction and payment
     # creation, so exactly one payment must exist and only one renter has paid.
