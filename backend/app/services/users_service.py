@@ -81,6 +81,11 @@ class UserService:
             top_up_amount - The balance top-up amount contained in the validated schema.
         """
         if top_up_amount.sum <= 0:
+            logger.warning(
+                "Top up balance rejected: amount less than 0, user_id=%s, amount=%s",
+                user_id,
+                top_up_amount,
+            )
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="The top-up amount cannot be less than or equal to 0.",
