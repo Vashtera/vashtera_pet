@@ -137,8 +137,17 @@ class BookingService:
             )
             # This variable retrieves the total amount by calling a separate function that calculates the number of nights for the booking.
 
-            await self.payment_repo.balance_deduction(renter_id, total_price)
+            deducted = await self.payment_repo.balance_deduction(renter_id, total_price)
             # The user's balance is being deducted along with the total booking amount.
+            if deducted is None:
+                logger.warning(
+                    "Booking rejected: insufficient funds, renter_id=%s, total=%s",
+                    renter_id,
+                    total_price,
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient funds"
+                )
 
             payment_data = PaymentCreate(
                 from_user_id=renter_id,
@@ -237,7 +246,7 @@ class BookingService:
             commission = PaymentService.commission_calculation(released_payment[0])
             user_id = released_payment[1]
             payout = released_payment[0] - commission
-            await self.user_repo.credit_balance_to_landlord(user_id, payout)
+            await self.user_repo.credit_balance(user_id, payout)
             await self.session.commit()
         except HTTPException:
             # Expected business errors are already logged as warnings where they are raised.
@@ -310,7 +319,7 @@ class BookingService:
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Payment doesn't exist",
                     )
-                await self.user_repo.top_up_balance(booking.renter_id, refunded_payment)
+                await self.user_repo.credit_balance(booking.renter_id, refunded_payment)
             else:
                 released_payment = await self.payment_repo.update_status_to_released(
                     booking.payment_id
@@ -328,7 +337,7 @@ class BookingService:
                 commission = PaymentService.commission_calculation(released_payment[0])
                 user_id = released_payment[1]
                 payout = released_payment[0] - commission
-                await self.user_repo.credit_balance_to_landlord(user_id, payout)
+                await self.user_repo.credit_balance(user_id, payout)
             await self.session.commit()
         except Exception:
             logger.exception(

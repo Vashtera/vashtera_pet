@@ -35,7 +35,9 @@ class PaymentRepo:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def balance_deduction(self, user_id: int, deduction_amount: Decimal) -> None:
+    async def balance_deduction(
+        self, user_id: int, deduction_amount: Decimal
+    ) -> int | None:
         """
         Function for deducting a user's balance by their ID,
         ensuring that the balance is greater than or equal to the deduction amount.
@@ -48,9 +50,11 @@ class PaymentRepo:
             update(User)
             .where(User.id == user_id, User.balance >= deduction_amount)
             .values(balance=User.balance - deduction_amount)
+            .returning(User.id)
         )
-        await self.session.execute(stmt)
+        result = await self.session.execute(stmt)
         await self.session.flush()
+        return result.scalar_one_or_none()
 
     async def create_payment(self, payment_data: PaymentCreate) -> Payment:
         """

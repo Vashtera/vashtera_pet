@@ -87,6 +87,7 @@ class UserRepo:
         self, user_id: int, top_up_amount: UserTopUpBalance
     ) -> None:
         """
+        ONLY FOR 1 ROUTER TO TOP UP USER'S BALANCE
         Topping up the user's balance
 
         Args:
@@ -101,7 +102,7 @@ class UserRepo:
         await self.session.execute(stmt)
         await self.session.commit()
 
-    async def credit_balance_to_landlord(self, user_id: int, amount: Decimal) -> None:
+    async def credit_balance(self, user_id: int, amount: Decimal) -> None:
         """Add an amount to a user's balance.
 
         The addition is done inside the database (``balance = balance + amount``),

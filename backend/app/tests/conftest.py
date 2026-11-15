@@ -17,13 +17,12 @@ ADMIN_URL = _url.set(database="postgres")
 os.environ["DATABASE_URL"] = TEST_URL
 os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
 import pytest
+from database import Base, get_db
 from httpx import ASGITransport, AsyncClient
+from main import app
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
-
-from ..database import Base, get_db
-from ..main import app
 
 
 @pytest.fixture(scope="session")
@@ -108,44 +107,3 @@ async def clean_database(db_session):
     tables = ", ".join(f'"{t.name}"' for t in Base.metadata.sorted_tables)
     await db_session.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
     await db_session.commit()
-
-
-async def create_test_user(
-    client: AsyncClient,
-    username: str = "testuser",
-    email: str = "test@example.com",
-    password: str = "testpassword123",
-    contact_number: str = "87770001122",
-) -> dict:
-    response = await client.post(
-        "/api/users",
-        json={
-            "username": username,
-            "email": email,
-            "password": password,
-            "contact_number": contact_number,
-        },
-    )
-    # TODO change status_code to 201
-    assert response.status_code == 200, f"Failed to create user: {response.text}"
-    return response.json()
-
-
-async def login_user(
-    client: AsyncClient,
-    email: str = "test@example.com",
-    password: str = "testpassword123",
-) -> str:
-    response = await client.post(
-        "/api/users/token",
-        data={
-            "username": email,
-            "password": password,
-        },
-    )
-    assert response.status_code == 200, f"Failed to login: {response.text}"
-    return response.json()["access_token"]
-
-
-def auth_header(token: str) -> dict[str, str]:
-    return {"Authorization": f"Bearer {token}"}
