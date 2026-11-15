@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 
 from core.security import hash_password
@@ -5,6 +6,8 @@ from models.users_model import User
 from schemas.users_scheme import UserCreate, UserTopUpBalance
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 
 class UserRepo:
@@ -76,6 +79,7 @@ class UserRepo:
             await self.session.refresh(new_user)
             return new_user
         except Exception:
+            logger.exception("Unexpected error while create user")
             await self.session.rollback()
             raise
 
