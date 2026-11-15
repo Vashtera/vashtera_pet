@@ -22,7 +22,7 @@ COMMISSION_RATE = Decimal("0.05")
 class BookingService:
     def __init__(self, db: AsyncSession):
         self.session = db
-        # This session is used exclusively to maintain a single session throughout the entire booking creation function.
+        # This session is used exclusively to maintain a single session throughout the entire booking creation, complete and cancel functions.
         self.booking_repo = BookingRepo(db)
         self.payment_repo = PaymentRepo(db)
         self.premise_repo = PremiseRepo(db)
@@ -210,6 +210,9 @@ class BookingService:
         """
         booking = await self.booking_repo.get_booking_by_id(booking_id)
         if booking is None:
+            logger.warning(
+                "Complete booking rejected: bookingnot found, booking_id=%s", booking_id
+            )
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist"
             )
@@ -221,6 +224,10 @@ class BookingService:
                 booking.payment_id
             )
             if released_payment is None:
+                logger.error(
+                    "Update payment status rejected: payment not found, booking_id=%s",
+                    booking_id,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Payment doesn't exist",
@@ -232,8 +239,15 @@ class BookingService:
             payout = released_payment[0] - commission
             await self.user_repo.credit_balance_to_landlord(user_id, payout)
             await self.session.commit()
+        except HTTPException:
+            # Expected business errors are already logged as warnings where they are raised.
+            await self.session.rollback()
+            raise
         except Exception:
             await self.session.rollback()
+            logger.exception(
+                "Unexpected error while complete statuses, booking_id=%s", booking_id
+            )
             raise
 
     async def cancel_booking_and_payment(self, booking_id: int, renter_id: int) -> None:
