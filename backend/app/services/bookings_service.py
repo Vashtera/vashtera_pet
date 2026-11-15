@@ -37,12 +37,22 @@ class BookingService:
         """
         if booking.date_from == booking.date_to:
             # Validation to prevent the check-out date from being equal to the check-in date and avoid database-level errors.
+            logger.warning(
+                "Booking rejected: check-in equals check-out, premise_id=%s, date=%s",
+                booking.premise_id,
+                booking.date_from,
+            )
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="The check-in and check-out dates cannot be the same.",
             )
         if booking.date_from < date.today():
             # Validation to prevent creating a booking for dates in the past.
+            logger.warning(
+                "Booking rejected: check-in in the past, premise_id=%s, date_from=%s",
+                booking.premise_id,
+                booking.date_from,
+            )
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="You cannot enter a date from the past.",
@@ -50,6 +60,12 @@ class BookingService:
         conflicts = await self.booking_repo.check_conflict(booking)
         # A variable that calls the repository to check for conflicts at the database level and prevent date overlaps.
         if conflicts:
+            logger.warning(
+                "Booking rejected: dates overlap, premise_id=%s, date_from=%s, date_to=%s",
+                booking.premise_id,
+                booking.date_from,
+                booking.date_to,
+            )
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="The selected time range is conflicts with an existing bookings for this time",
