@@ -167,7 +167,7 @@ class PremiseRepo:
         await self.session.refresh(premise, attribute_names=["landlord"])
         return premise
 
-    async def get_landlords_premise(self, premise_id: int) -> User | None:
+    async def get_premises_landlord(self, premise_id: int) -> User | None:
         """
         Get the landlord of a premise by premise_id
 
