@@ -1,5 +1,5 @@
 import asyncio
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -106,7 +106,7 @@ async def _balance(db: AsyncSession, user_id: int) -> Decimal:
 
 
 @pytest.mark.anyio
-async def test_create_double_bookings(concurrent_client: AsyncClient):
+async def test_create_double_bookings(concurrent_client: AsyncClient, db_session):
     landlord = await _register_and_login(
         concurrent_client, "landlord", "landlord@mail.com", "87770001122"
     )
@@ -163,10 +163,17 @@ async def test_create_double_bookings(concurrent_client: AsyncClient):
         concurrent_client.post("/api/bookings", json=payload, headers=renter_2),
     )
 
-    statuses = [r.status_code for r in responses]
-    print("statuses:", statuses, [r.text for r in responses])
+    statuses = sorted(r.status_code for r in responses)
+    assert statuses == [201, 409], [r.text for r in responses]
 
-    assert statuses.count(201) == 1
+    # Rollback check: the loser's request failed after the deduction and payment
+    # creation, so exactly one payment must exist and only one renter has paid.
+    payments = await db_session.scalar(select(func.count()).select_from(Payment))
+    assert payments == 1
+
+    balance_1 = await _balance(db_session, 2)
+    balance_2 = await _balance(db_session, 3)
+    assert sorted([balance_1, balance_2]) == [Decimal("30000"), Decimal("50000")]
 
 
 @pytest.mark.anyio
@@ -326,3 +333,87 @@ async def test_complete_booking_twice_does_not_pay_twice(client, db_session):
         pass  # a rejected repeat is fine; paying twice is not
 
     assert await _balance(db_session, ctx.landlord_id) == Decimal("19000")  # not 38000
+
+
+@pytest.mark.anyio
+async def test_repeated_booking_request_charges_once(client, db_session):
+    """Double click: the same booking sent twice is charged only once."""
+    ctx = await _setup(client, db_session)
+    d = date.today() + timedelta(days=10)
+
+    first = await _book(client, ctx, d, d + timedelta(days=2))
+    second = await _book(client, ctx, d, d + timedelta(days=2))
+
+    assert first.status_code == 201, first.text
+    assert second.status_code == 409, second.text
+    assert await _balance(db_session, ctx.renter_id) == Decimal("30000")
+    assert await db_session.scalar(select(func.count()).select_from(Payment)) == 1
+
+
+@pytest.mark.anyio
+async def test_checkout_day_equals_next_checkin_is_allowed(client, db_session):
+    """Back-to-back stays: check-out day of one guest is check-in day of the next."""
+    ctx = await _setup(client, db_session, renter_balance="500000")
+    d = date.today() + timedelta(days=10)
+
+    first = await _book(client, ctx, d, d + timedelta(days=2))
+    second = await _book(client, ctx, d + timedelta(days=2), d + timedelta(days=4))
+
+    assert first.status_code == 201, first.text
+    assert second.status_code == 201, second.text
+
+
+@pytest.mark.anyio
+async def test_one_night_overlap_is_rejected(client, db_session):
+    """Even a single shared night must be a conflict."""
+    ctx = await _setup(client, db_session, renter_balance="500000")
+    d = date.today() + timedelta(days=10)
+
+    first = await _book(client, ctx, d, d + timedelta(days=2))
+    second = await _book(client, ctx, d + timedelta(days=1), d + timedelta(days=3))
+
+    assert first.status_code == 201, first.text
+    assert second.status_code == 409, second.text
+
+
+@pytest.mark.anyio
+async def test_same_dates_on_another_premise_are_allowed(client, db_session):
+    """Dates are blocked per premise, not globally."""
+    ctx = await _setup(client, db_session, renter_balance="500000")
+    d = date.today() + timedelta(days=10)
+
+    resp = await client.post(
+        "/api/premises/new", json=PREMISE_JSON, headers=ctx.landlord_headers
+    )
+    assert resp.status_code in (200, 201), resp.text
+    second_premise_id = await db_session.scalar(
+        select(Premise.id).order_by(Premise.id.desc()).limit(1)
+    )
+    other = replace(ctx, premise_id=second_premise_id)
+
+    first = await _book(client, ctx, d, d + timedelta(days=2))
+    second = await _book(client, other, d, d + timedelta(days=2))
+
+    assert first.status_code == 201, first.text
+    assert second.status_code == 201, second.text
+
+
+@pytest.mark.anyio
+async def test_cancelled_booking_frees_the_dates(client, db_session):
+    """booking -> cancel -> the same dates can be booked again."""
+    ctx = await _setup(client, db_session)
+    d = date.today() + timedelta(days=10)
+
+    first = await _book(client, ctx, d, d + timedelta(days=2))
+    assert first.status_code == 201, first.text
+    booking_id = await db_session.scalar(select(Booking.id))
+
+    cancel = await client.post(
+        f"/api/bookings/{booking_id}/cancel", headers=ctx.renter_headers
+    )
+    assert cancel.status_code == 200, cancel.text
+
+    again = await _book(client, ctx, d, d + timedelta(days=2))
+    assert again.status_code == 201, again.text
+    # Refunded once, paid once more: 50000 - 20000 = 30000.
+    assert await _balance(db_session, ctx.renter_id) == Decimal("30000")
