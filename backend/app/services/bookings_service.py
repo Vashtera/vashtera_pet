@@ -28,7 +28,7 @@ class BookingService:
         self.premise_repo = PremiseRepo(db)
         self.user_repo = UserRepo(db)
 
-    async def check_coflicts_service(self, booking: BookingCreate) -> None:
+    async def check_conflicts_service(self, booking: BookingCreate) -> None:
         """
         Function for checking conflicts and protecting against incorrect date input.
 
@@ -87,7 +87,7 @@ class BookingService:
             HTTP_409 - Foreign key, uniqueness, or date constraint violation.
             HTTP_403 - If user wants book his own premise
         """
-        await self.check_coflicts_service(booking)
+        await self.check_conflicts_service(booking)
         # First, check for date conflicts and overlapping dates at the database level.
 
         try:
