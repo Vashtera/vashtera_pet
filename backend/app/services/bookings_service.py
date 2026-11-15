@@ -93,20 +93,36 @@ class BookingService:
         try:
             landlord = await self.premise_repo.get_premise_landlord(booking.premise_id)
             if landlord is None:
+                logger.error(
+                    "Booking rejected: landlord is None, premise_id=%s",
+                    booking.premise_id,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Landlord not found"
                 )
             premise = await self.premise_repo.get_premise_by_id(booking.premise_id)
             if premise is None:
+                logger.warning(
+                    "Booking rejected: premise not found, premise_id=%s",
+                    booking.premise_id,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Premise not found"
                 )
             if premise.landlord_id == renter_id:
+                logger.warning(
+                    "Booking rejected: landlord tried to book his own premise, premise_id=%s",
+                    booking.premise_id,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="You cannot book your own premise",
                 )
             if premise.status == BookingStatus.CONFIRMED:
+                logger.error(
+                    "Booking rejected: attempt to book an already booked space, premise_id=%s",
+                    booking.premise_id,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="You cannot book a space that has already been booked",
@@ -152,12 +168,29 @@ class BookingService:
                 # It has a `sqlstate` code. `23P01` means "exclusion constraint violation",
                 # which indicates a violation of our date-overlap constraint.
                 # `getattr(..., None)` safely returns `None` if the attribute does not exist, preventing the code from crashing.
+                logger.warning(
+                    "Booking rejected by DB constraint (race condition): "
+                    "premise_id=%s, date_from=%s, date_to=%s",
+                    booking.premise_id,
+                    booking.date_from,
+                    booking.date_to,
+                )
                 raise HTTPException(status_code=409, detail="Dates are already booked")
+            logger.exception(
+                "Unexpected integrity error while creating booking: premise_id=%s",
+                booking.premise_id,
+            )
+            raise
+        except HTTPException:
+            # Expected business errors are already logged as warnings where they are raised.
+            await self.session.rollback()
             raise
         except Exception:
-            # Any other error (e.g., insufficient funds or a bug in the code) must also roll back the transaction.
-            # It is then re-raised so that the upper level can handle it.
             await self.session.rollback()
+            logger.exception(
+                "Unexpected error while creating booking: premise_id=%s",
+                booking.premise_id,
+            )
             raise
 
     async def complete_booking_and_payment(self, booking_id: int) -> None:
