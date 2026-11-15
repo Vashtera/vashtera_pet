@@ -417,3 +417,38 @@ async def test_cancelled_booking_frees_the_dates(client, db_session):
     assert again.status_code == 201, again.text
     # Refunded once, paid once more: 50000 - 20000 = 30000.
     assert await _balance(db_session, ctx.renter_id) == Decimal("30000")
+
+
+@pytest.mark.anyio
+async def test_checkout_equal_to_checkin_is_rejected(client, db_session):
+    ctx = await _setup(client, db_session)
+    d = date.today() + timedelta(days=10)
+
+    resp = await _book(client, ctx, d, d)
+
+    assert resp.status_code == 400, resp.text
+    assert await _balance(db_session, ctx.renter_id) == Decimal("50000")
+
+
+@pytest.mark.anyio
+async def test_checkin_in_the_past_is_rejected(client, db_session):
+    ctx = await _setup(client, db_session)
+    today = date.today()
+
+    resp = await _book(
+        client, ctx, today - timedelta(days=2), today + timedelta(days=1)
+    )
+
+    assert resp.status_code == 400, resp.text
+    assert await _balance(db_session, ctx.renter_id) == Decimal("50000")
+
+
+@pytest.mark.anyio
+async def test_checkout_before_checkin_is_rejected(client, db_session):
+    ctx = await _setup(client, db_session)
+    d = date.today() + timedelta(days=10)
+
+    resp = await _book(client, ctx, d + timedelta(days=3), d)
+
+    assert resp.status_code == 400, resp.text
+    assert await _balance(db_session, ctx.renter_id) == Decimal("50000")
