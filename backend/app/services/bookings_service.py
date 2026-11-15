@@ -91,7 +91,7 @@ class BookingService:
         # First, check for date conflicts and overlapping dates at the database level.
 
         try:
-            landlord = await self.premise_repo.get_premise_landlord(booking.premise_id)
+            landlord = await self.premise_repo.get_landlords_premise(booking.premise_id)
             if landlord is None:
                 logger.error(
                     "Booking rejected: landlord is None, premise_id=%s",

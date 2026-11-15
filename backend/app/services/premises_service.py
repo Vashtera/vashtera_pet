@@ -117,15 +117,23 @@ class PremiseService:
         """
         premise = await self.session.get_premise_by_id(premise_id)
         if not premise:
+            logger.warning(
+                "Delete premise rejected: premise not found, premise_id=%s", premise_id
+            )
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Premise not found",
             )
 
         if premise.landlord_id != user_id:
+            logger.warning(
+                "Delete premise rejected: user is not landlord, user_id=%s, premise_id=%s",
+                user_id,
+                premise_id,
+            )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Premise not found",
+                detail="You are not a landlord of this premise",
             )
 
         await self.session.delete_premise_by_id(premise_id)
@@ -160,15 +168,23 @@ class PremiseService:
         """
         premise = await self.session.get_premise_by_id(premise_id)
         if not premise:
+            logger.warning(
+                "Update premise rejected: premise not found, premise_id=%s", premise_id
+            )
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Premise not found",
             )
 
         if premise.landlord_id != user_id:
+            logger.warning(
+                "Update premise rejected: user is not landlord, user_id=%s, premise_id=%s",
+                user_id,
+                premise_id,
+            )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Premise not found",
+                detail="You are not a landlord of this premise",
             )
 
         if status.HTTP_422_UNPROCESSABLE_CONTENT:

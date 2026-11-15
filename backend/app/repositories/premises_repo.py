@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 
 from models.premises_model import Premise, PremiseAddress, PremiseFeature
@@ -11,6 +12,8 @@ from schemas.premises_scheme import (
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+logger = logging.getLogger(__name__)
 
 
 class PremiseRepo:
@@ -117,6 +120,7 @@ class PremiseRepo:
             premise = await self.get_premise_by_id(db_premise.id)
             return premise
         except Exception:
+            logger.exception("Unexpected error while create premise")
             await self.session.rollback()
             raise
 
@@ -163,7 +167,7 @@ class PremiseRepo:
         await self.session.refresh(premise, attribute_names=["landlord"])
         return premise
 
-    async def get_premise_landlord(self, premise_id: int) -> User | None:
+    async def get_landlords_premise(self, premise_id: int) -> User | None:
         """
         Get the landlord of a premise by premise_id
 
